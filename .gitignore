@@ -1,0 +1,59 @@
+# ── Dependencias ─────────────────────────────────────────────
+node_modules/
+vendor/
+.pnp
+.pnp.js
+
+# ── Entorno y credenciales (NUNCA subir) ─────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ── Build / salidas ──────────────────────────────────────────
+dist/
+dist-ssr/
+build/
+out/
+.vite/
+*.tsbuildinfo
+
+# ── Caché y temporales ───────────────────────────────────────
+.cache/
+.eslintcache
+*.tmp
+*.local
+
+# ── Logs ─────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ── Cobertura / tests ────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ── Bases de datos locales ───────────────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+
+# ── Editores / IDE ───────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Sistema operativo ────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── Herramientas locales (no son parte del proyecto) ─────────
+.claude/

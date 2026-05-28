@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Proyectos</title>
+    <!--
+      El tema NO se pre-aplica desde localStorage (ya no lo usamos): la
+      fuente de verdad son las preferencias del usuario en la BASE DE DATOS.
+      El primer paint usa los defaults de index.css (azul #295072) y, apenas
+      /auth/me resuelve, el ThemeContext aplica el tema del usuario. El
+      ViewSkeleton del AuthContext cubre ese instante de carga.
+    -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

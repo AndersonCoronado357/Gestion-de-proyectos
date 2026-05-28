@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode (Vite) */
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "useDefineForClassFields": true,
+
+    /* Strict — best practices, con margen para migración */
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Path aliases */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    "types": ["vite/client", "node", "jest"],
+
+    /* Migración gradual: permite que algún .js/.jsx residual no rompa */
+    "allowJs": true,
+    "checkJs": false,
+
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["src", "vite.config.ts"]
+}
