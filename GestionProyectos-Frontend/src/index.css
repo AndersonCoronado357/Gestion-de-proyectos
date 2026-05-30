@@ -1,0 +1,308 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Variables en canales RGB (sin coma) para soportar /opacity en Tailwind */
+  --color-primary-50: 238 243 247;
+  --color-primary-100: 210 223 233;
+  --color-primary-200: 170 195 216;
+  --color-primary-300: 122 158 186;
+  --color-primary-400: 82 124 156;
+  --color-primary-500: 56 98 134;
+  --color-primary-600: 41 80 114;
+  --color-primary-700: 33 64 92;
+  --color-primary-800: 27 52 75;
+  --color-primary-900: 20 39 56;
+
+  --color-bg: 255 255 255;
+  --color-bg-muted: 237 240 244;
+
+  --color-fg: 15 23 42;
+  --color-fg-muted: 71 85 105;
+  --color-fg-subtle: 100 116 139;
+  --color-fg-faint: 148 163 184;
+
+  --color-surface-hover: 241 245 249;
+
+  --color-border: 226 232 240;
+  --color-border-subtle: 241 245 249;
+
+  --color-page-bg: 237 240 243;
+
+  --color-sidebar-bg: var(--color-bg);
+  --color-sidebar-hover: var(--color-bg-muted);
+  --color-sidebar-active: var(--color-primary-50);
+
+  --color-scrollbar-track: transparent;
+  --color-scrollbar-thumb: rgb(var(--color-primary-100));
+  --color-scrollbar-thumb-hover: rgb(var(--color-primary-200));
+
+  --sidebar-width: 224px;
+  --sidebar-width-collapsed: 60px;
+  --header-height: 56px;
+
+  /* Multiplicador del tamaño de letra. Sólo afecta `font-size`, nunca
+     alturas/paddings (que están en rem fijos), así los contenedores no
+     se mueven. */
+  --text-scale: 1;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-bg text-fg font-sans;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  input,
+  textarea,
+  select {
+    caret-color: rgb(var(--color-primary-600));
+    accent-color: rgb(var(--color-primary-600));
+  }
+
+  /* Oculta las "rayitas" del grip de resize del textarea, pero deja que se
+     pueda cambiar el alto arrastrando el borde inferior (resize: vertical). */
+  textarea::-webkit-resizer {
+    display: none;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill {
+    -webkit-text-fill-color: rgb(var(--color-fg));
+    -webkit-box-shadow: 0 0 0 1000px rgb(var(--color-bg)) inset;
+    box-shadow: 0 0 0 1000px rgb(var(--color-bg)) inset;
+    caret-color: rgb(var(--color-primary-600));
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  ::selection {
+    background-color: rgb(var(--color-primary-200));
+    color: rgb(var(--color-primary-900));
+  }
+}
+
+/* Multiplica los `text-[Xpx]` arbitrarios por --text-scale.
+   Hacemos esto en CSS plano (no en plugin de Tailwind) porque cualquier
+   cambio en tailwind.config.js exige reiniciar Vite, y queremos que
+   funcione sin tocar el dev server. */
+.text-\[9px\] { font-size: calc(9px * var(--text-scale, 1)); }
+.text-\[10px\] { font-size: calc(10px * var(--text-scale, 1)); }
+.text-\[10\.5px\] { font-size: calc(10.5px * var(--text-scale, 1)); }
+.text-\[11px\] { font-size: calc(11px * var(--text-scale, 1)); }
+.text-\[11\.5px\] { font-size: calc(11.5px * var(--text-scale, 1)); }
+.text-\[12px\] { font-size: calc(12px * var(--text-scale, 1)); }
+.text-\[12\.5px\] { font-size: calc(12.5px * var(--text-scale, 1)); }
+.text-\[13px\] { font-size: calc(13px * var(--text-scale, 1)); }
+.text-\[13\.5px\] { font-size: calc(13.5px * var(--text-scale, 1)); }
+.text-\[14px\] { font-size: calc(14px * var(--text-scale, 1)); }
+.text-\[15px\] { font-size: calc(15px * var(--text-scale, 1)); }
+.text-\[18px\] { font-size: calc(18px * var(--text-scale, 1)); }
+.text-\[20px\] { font-size: calc(20px * var(--text-scale, 1)); }
+.text-\[21px\] { font-size: calc(21px * var(--text-scale, 1)); }
+.text-\[24px\] { font-size: calc(24px * var(--text-scale, 1)); }
+.text-\[26px\] { font-size: calc(26px * var(--text-scale, 1)); }
+.text-\[28px\] { font-size: calc(28px * var(--text-scale, 1)); }
+.text-\[30px\] { font-size: calc(30px * var(--text-scale, 1)); }
+.text-\[32px\] { font-size: calc(32px * var(--text-scale, 1)); }
+
+body {
+  font-size: calc(13px * var(--text-scale, 1));
+}
+
+/* Skeleton — barrido suave de un gradiente GRIS NEUTRO (no del color de
+   marca, así no choca con la UI). Se anima la posición del background, con
+   contraste bajo entre los grises → efecto sutil. */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgb(223 228 234) 25%,
+    rgb(214 221 228) 50%,
+    rgb(223 228 234) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-sweep 2.2s ease-in-out infinite;
+}
+[data-theme='dark'] .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgb(32 40 50) 25%,
+    rgb(40 49 60) 50%,
+    rgb(32 40 50) 75%
+  );
+  background-size: 200% 100%;
+}
+@keyframes skeleton-sweep {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer { animation: none; }
+}
+
+/* Loading bar indeterminate — fluido: la barra se llena de izq→der con
+   scaleX, y en el punto en que ya está llena cambia el origen a la
+   derecha para vaciarse desde la izquierda. Animamos sólo `transform`
+   (GPU-accelerated) y linear timing → sin saltos ni tirones. */
+@keyframes loading-bar-indeterminate {
+  0%   { transform: scaleX(0); transform-origin: 0% 50%; }
+  49.999% { transform: scaleX(1); transform-origin: 0% 50%; }
+  50%  { transform: scaleX(1); transform-origin: 100% 50%; }
+  100% { transform: scaleX(0); transform-origin: 100% 50%; }
+}
+
+/* Loader bolitas (full-screen + inline). */
+@keyframes loader-rotate {
+  0% { transform: rotate(0deg) scale(0.8); }
+  50% { transform: rotate(360deg) scale(1.2); }
+  100% { transform: rotate(720deg) scale(0.8); }
+}
+@keyframes loader-ball-1 {
+  0% { box-shadow: 24px 0 0 rgb(var(--color-primary-400)); }
+  50% { box-shadow: 0 0 0 rgb(var(--color-primary-400)); margin-bottom: 0; transform: translate(12px, 12px); }
+  100% { box-shadow: 24px 0 0 rgb(var(--color-primary-400)); margin-bottom: 8px; }
+}
+@keyframes loader-ball-2 {
+  0% { box-shadow: 24px 0 0 rgb(var(--color-primary-200)); }
+  50% { box-shadow: 0 0 0 rgb(var(--color-primary-200)); margin-top: -16px; transform: translate(12px, 12px); }
+  100% { box-shadow: 24px 0 0 rgb(var(--color-primary-200)); margin-top: 0; }
+}
+.loader-balls {
+  animation: loader-rotate 1.8s infinite;
+  height: 40px;
+  width: 40px;
+}
+.loader-balls::before,
+.loader-balls::after {
+  border-radius: 50%;
+  content: '';
+  display: block;
+  height: 16px;
+  width: 16px;
+}
+.loader-balls::before {
+  animation: loader-ball-1 1.8s infinite;
+  background-color: rgb(var(--color-primary-700));
+  box-shadow: 24px 0 0 rgb(var(--color-primary-400));
+  margin-bottom: 8px;
+}
+.loader-balls::after {
+  animation: loader-ball-2 1.8s infinite;
+  background-color: rgb(var(--color-primary-400));
+  box-shadow: 24px 0 0 rgb(var(--color-primary-200));
+}
+
+/* Icon line-draw — el path se construye animando stroke-dashoffset.
+   Usar con `pathLength={1}` en el SVG y `stroke-dasharray: 1` inicial. */
+@keyframes icon-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+.icon-draw {
+  pathLength: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: icon-draw 0.35s ease-out forwards;
+}
+
+/* Alertas modales — animaciones pop, pulse, shake, bounce. */
+@keyframes alert-bounce-in {
+  0% { opacity: 0; transform: scale(0.7) translateY(20px); }
+  50% { transform: scale(1.05) translateY(-5px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes alert-pulse-ring {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+@keyframes alert-icon-pop {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes alert-error-shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+@keyframes alert-warning-bounce {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-10px); }
+  50% { transform: translateY(0); }
+  75% { transform: translateY(-5px); }
+}
+@keyframes alert-slide-in-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes alert-fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Toast — icono pop-in con bounce. */
+@keyframes toast-icon-in {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Toast — slide desde la derecha. */
+@keyframes toast-slide-in {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes toast-slide-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(40px); }
+}
+
+/* Animaciones reutilizables — se invocan con `animate-[nombre_duración_ease]`. */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slide-up-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Scrollbar global (idéntico al que tenía .scroll-thin del sidebar) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-scrollbar-thumb-hover);
+}
+::-webkit-scrollbar-button {
+  display: none;
+}

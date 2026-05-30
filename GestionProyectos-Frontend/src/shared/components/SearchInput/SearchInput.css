@@ -1,0 +1,22 @@
+.search-clean::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 14px;
+  width: 14px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M18 6 6 18M6 6l12 12'/></svg>");
+  background-size: 12px 12px;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+.search-clean::-webkit-search-cancel-button:hover {
+  opacity: 1;
+}
+
+.search-clean::-webkit-search-decoration,
+.search-clean::-webkit-search-results-button,
+.search-clean::-webkit-search-results-decoration {
+  display: none;
+}
