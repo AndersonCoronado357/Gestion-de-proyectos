@@ -226,8 +226,9 @@ function SaveBadge({ status }: { status: SaveStatus }) {
 
 // Vista previa de ESTE mensaje: sólo el panel (el "cuadrito"), a buen tamaño.
 function LoginPreview({ slides, activeIndex }: { slides: LoginSlide[]; activeIndex: number }) {
+  // Móvil: ocupa todo el ancho con su proporción (5/6). lg+: fijo 400×480.
   return (
-    <div className="shrink-0" style={{ width: 400, height: 480 }}>
+    <div className="aspect-[5/6] w-full shrink-0 lg:aspect-auto lg:h-[480px] lg:w-[400px]">
       <LoginPanel slides={slides} activeIndex={activeIndex} />
     </div>
   );
@@ -239,7 +240,7 @@ function BgPicker({ value, onChange }: { value: number; onChange: (bg: number) =
   return (
     <div>
       <div className="mb-1.5 text-[12.5px] font-medium text-fg-muted">Fondo</div>
-      <div className="grid grid-cols-6 gap-3">
+      <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-6 sm:gap-3">
         {Array.from({ length: CIRCLE_LAYOUT_COUNT }).map((_, n) => {
           const selected = (value ?? 0) === n;
           return (
@@ -308,62 +309,65 @@ function MessageRow({ item, index, slides, onUpdate, onSetBg, onRemove }: Messag
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{ ...style, touchAction: 'auto' }}
       {...attributes}
-      className="flex items-center gap-4 rounded-xl bg-bg p-4 shadow-sm"
+      className="flex items-stretch gap-3 rounded-xl bg-bg p-3 shadow-sm sm:gap-4 sm:p-4"
     >
-      {/* Mango de arrastre: tira vertical a TODA la altura del item (fácil de
-          agarrar), con el icono centrado. Sólo se arrastra desde aquí, para no
-          robar el scroll ni la selección de texto del resto del item. */}
+      {/* Mango de arrastre. En móvil: handle chico arriba (para NO bloquear el
+          scroll táctil). En lg+: riel a toda la altura. El touch-action:none
+          vive SOLO en el mango (la fila completa queda con scroll libre). */}
       <span
         {...listeners}
         aria-label="Arrastrar para reordenar"
-        className="flex w-6 shrink-0 cursor-grab touch-none items-center justify-center self-stretch text-fg-faint transition-colors hover:text-fg-muted active:cursor-grabbing"
+        className="mt-1 flex h-7 w-7 shrink-0 cursor-grab touch-none items-center justify-center self-start rounded-md text-fg-faint transition-colors hover:bg-bg-muted hover:text-fg-muted active:cursor-grabbing lg:mt-0 lg:h-auto lg:w-6 lg:self-stretch lg:rounded-none lg:hover:bg-transparent"
       >
         <GripIcon width={14} height={14} />
       </span>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-fg-faint">
-            Mensaje {index + 1}
-          </span>
-          <button
-            type="button"
-            onClick={onRemove}
-            title="Quitar"
-            aria-label="Quitar"
-            className="flex h-7 w-7 items-center justify-center rounded-md text-fg-faint transition-colors hover:bg-red-50 hover:text-red-600"
-          >
-            <svg viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 6h18" />
-              <path d="M8 6V4h8v2" />
-              <path d="m6 6 1 14h10l1-14" />
-            </svg>
-          </button>
+      {/* Editor + preview: apilados en móvil, lado a lado en lg+. */}
+      <div className="flex min-w-0 flex-1 flex-col gap-4 lg:flex-row lg:items-start">
+        <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-fg-faint">
+              Mensaje {index + 1}
+            </span>
+            <button
+              type="button"
+              onClick={onRemove}
+              title="Quitar"
+              aria-label="Quitar"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-fg-faint transition-colors hover:bg-red-50 hover:text-red-600"
+            >
+              <svg viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 6h18" />
+                <path d="M8 6V4h8v2" />
+                <path d="m6 6 1 14h10l1-14" />
+              </svg>
+            </button>
+          </div>
+
+          <Input
+            id={`login-msg-title-${item.id}`}
+            label="Título"
+            value={item.title}
+            onChange={(e) => onUpdate(item.id, 'title', e.target.value)}
+            placeholder="Ej. Todos tus proyectos, en un solo lugar."
+            maxLength={200}
+          />
+          <Textarea
+            label="Texto"
+            value={item.text}
+            onChange={(e) => onUpdate(item.id, 'text', e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="Una frase corta de apoyo."
+          />
+          <BgPicker value={item.bg} onChange={onSetBg} />
         </div>
 
-        <Input
-          id={`login-msg-title-${item.id}`}
-          label="Título"
-          value={item.title}
-          onChange={(e) => onUpdate(item.id, 'title', e.target.value)}
-          placeholder="Ej. Todos tus proyectos, en un solo lugar."
-          maxLength={200}
-        />
-        <Textarea
-          label="Texto"
-          value={item.text}
-          onChange={(e) => onUpdate(item.id, 'text', e.target.value)}
-          rows={3}
-          maxLength={500}
-          placeholder="Una frase corta de apoyo."
-        />
-        <BgPicker value={item.bg} onChange={onSetBg} />
+        {/* Vista previa (sólo el panel) de ESTE mensaje. */}
+        <LoginPreview slides={slides} activeIndex={index} />
       </div>
-
-      {/* Vista previa (sólo el panel) de ESTE mensaje. */}
-      <LoginPreview slides={slides} activeIndex={index} />
     </div>
   );
 }

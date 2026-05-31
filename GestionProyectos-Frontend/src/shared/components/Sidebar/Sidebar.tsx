@@ -160,7 +160,7 @@ export default function Sidebar({
   return (
     <aside
       className={cn(
-        'flex h-screen flex-col overflow-hidden bg-bg text-fg shadow-[1px_0_2px_rgba(15,23,42,0.04)]',
+        'flex h-[100dvh] flex-col overflow-hidden bg-bg text-fg shadow-[1px_0_2px_rgba(15,23,42,0.04)]',
         'fixed inset-y-0 left-0 z-50 w-[240px] transition-transform duration-300 ease-out',
         'md:sticky md:top-0 md:z-40 md:w-auto md:translate-x-0 md:transition-none',
         mobileOpen ? 'translate-x-0' : '-translate-x-full'

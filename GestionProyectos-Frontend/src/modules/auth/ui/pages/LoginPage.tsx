@@ -60,7 +60,7 @@ export default function LoginPage() {
   const formOnLeft = mode === 'login';
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-primary-50 px-4 py-6 md:py-4">
+    <div className="relative flex min-h-[100dvh] items-center justify-center bg-primary-50 px-4 py-6 md:py-4">
       <div className="w-full max-w-5xl">
         <div className="relative overflow-hidden rounded-[28px] bg-bg shadow-[0_30px_60px_-15px_rgba(0,0,0,0.35)] md:h-[540px]">
           <div className="md:hidden">

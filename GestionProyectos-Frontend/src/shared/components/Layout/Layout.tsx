@@ -99,7 +99,7 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div
-      className="h-screen bg-page md:grid"
+      className="h-[100dvh] bg-page md:grid"
       style={{
         gridTemplateColumns: collapsed ? '60px 1fr' : '224px 1fr',
         transition: 'grid-template-columns 350ms cubic-bezier(0.4, 0, 0.2, 1)'

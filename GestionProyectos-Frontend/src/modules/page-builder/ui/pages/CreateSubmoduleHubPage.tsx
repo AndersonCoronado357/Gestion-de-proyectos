@@ -65,14 +65,14 @@ export default function CreateSubmoduleHubPage() {
   const [name, setName] = useState('');
 
   return (
-    <div className="flex h-full gap-4 overflow-hidden bg-page p-4 lg:p-6">
+    <div className="flex h-full flex-col gap-4 overflow-y-auto bg-page p-4 lg:flex-row lg:overflow-hidden lg:p-6">
       {/* ── Card 1: estructura del proyecto (con Volver arriba) ── */}
-      <aside className="flex w-[300px] shrink-0 flex-col overflow-hidden rounded-xl bg-bg shadow-sm">
+      <aside className="flex max-h-[45vh] w-full shrink-0 flex-col overflow-hidden rounded-xl bg-bg shadow-sm lg:h-full lg:max-h-none lg:w-[300px]">
         <ProjectStructureTree name={name} onBack={() => navigate(-1)} />
       </aside>
 
       {/* ── Card 2: header (input-título) + 3 opciones ── */}
-      <main className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl bg-bg shadow-sm">
+      <main className="flex w-full flex-col overflow-hidden rounded-xl bg-bg shadow-sm lg:min-h-0 lg:flex-1">
         {/* Header: input título (el nombre del submódulo), centrado. */}
         <div className="flex shrink-0 items-center justify-center border-b border-border-subtle px-5 py-3">
           <input
@@ -87,7 +87,7 @@ export default function CreateSubmoduleHubPage() {
         </div>
 
         {/* 5 opciones apiladas, ocupando todo el alto disponible. */}
-        <div className="grid min-h-0 flex-1 grid-rows-5 gap-3 p-5">
+        <div className="flex flex-col gap-3 p-4 sm:p-5 lg:grid lg:min-h-0 lg:flex-1 lg:grid-rows-5">
           {SECTIONS.map(({ id, title, description, Icon, route }) => (
             <button
               key={id}
