@@ -206,7 +206,13 @@ export default function UsersPage() {
 
   return (
     <div className="flex h-full gap-4 overflow-hidden p-3 sm:p-4 lg:p-8">
-      <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-bg shadow-sm">
+      {/* Lista — en móvil se oculta cuando hay un detalle abierto. */}
+      <div
+        className={cn(
+          'h-full min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-bg shadow-sm',
+          panelOpen ? 'hidden md:flex' : 'flex'
+        )}
+      >
         <div className="shrink-0 px-4 pt-4 pb-1 sm:px-5 sm:pt-5">
           <h2 className="text-[18px] font-bold tracking-tight text-fg">
             Usuarios
@@ -240,26 +246,10 @@ export default function UsersPage() {
         />
       </div>
 
-      {panelOpen && (
-        <button
-          type="button"
-          aria-label="Cerrar panel"
-          onClick={builder.closePanel}
-          className="fixed inset-0 z-30 bg-black/40 md:hidden animate-[fade-in_180ms_ease-out]"
-        />
-      )}
-
-      <div
-        className={cn(
-          'overflow-hidden rounded-xl bg-bg shadow-sm',
-          'fixed inset-y-3 right-3 z-40 w-[min(340px,calc(100vw-1.5rem))] transition-transform duration-300 ease-out',
-          'md:static md:inset-auto md:z-auto md:h-full md:shrink-0 md:transition-[width,opacity,margin]',
-          panelOpen
-            ? 'translate-x-0 opacity-100 md:w-[340px]'
-            : 'translate-x-[calc(100%+1rem)] opacity-100 md:translate-x-0 md:w-0 md:opacity-0'
-        )}
-      >
-        {builder.selectedUser && (
+      {/* Detalle — en móvil ocupa TODO el contenedor (la propia vista, no un
+          overlay); en desktop es un panel lateral junto a la lista. */}
+      {panelOpen && builder.selectedUser && (
+        <div className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-xl bg-bg shadow-sm md:w-[340px] md:flex-none md:shrink-0">
           <UserSidePanel
             user={builder.selectedUser}
             availableRoles={availableRoles}
@@ -269,8 +259,8 @@ export default function UsersPage() {
             onRemoveRole={builder.removeRoleFromUser}
             onClose={builder.closePanel}
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

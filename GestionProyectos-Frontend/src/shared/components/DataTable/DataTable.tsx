@@ -178,7 +178,50 @@ export default function DataTable<T>({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto px-3 sm:px-5">
+      {/* Móvil: cada fila como tarjeta apilada — sin scroll horizontal. La
+          1ª columna va de "cabecera" y el resto como pares etiqueta/valor. */}
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pb-3 md:hidden">
+        {paged.map((row, i) => (
+          <button
+            key={String(rowKey(row))}
+            type="button"
+            onClick={() => onRowClick?.(rowKey(row), row)}
+            style={{ animationDelay: `${i * 12}ms` }}
+            className="block w-full animate-[slide-up-fade_180ms_ease-out_both] rounded-xl bg-bg-muted p-3.5 text-left outline-none transition-colors active:bg-primary-500/10"
+          >
+            {columns[0] && (
+              <div className="mb-2.5">
+                {columns[0].render
+                  ? columns[0].render(row)
+                  : ((columns[0].accessor(row) as ReactNode) ?? '—')}
+              </div>
+            )}
+            <div className="space-y-1.5">
+              {columns.slice(1).map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-start justify-between gap-3"
+                >
+                  <span className="shrink-0 pt-px text-[10px] font-semibold uppercase tracking-wider text-fg-faint">
+                    {c.label}
+                  </span>
+                  <span className="min-w-0 break-words text-right text-[12px] text-fg-muted">
+                    {c.render ? c.render(row) : ((c.accessor(row) as ReactNode) ?? '—')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </button>
+        ))}
+        {paged.length === 0 && (
+          <div className="px-3 py-10 text-center text-[12px] text-fg-faint">
+            {emptyMessage}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop: tabla normal. */}
+      <div className="hidden min-h-0 flex-1 overflow-auto px-3 sm:px-5 md:block">
         <table className="w-full min-w-[480px] table-fixed border-separate border-spacing-0 sm:min-w-[560px]">
           <colgroup>
             {columns.map((c) => (
