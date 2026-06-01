@@ -50,5 +50,24 @@ module.exports = (db: Knex) => {
   router.get('/tree', authMiddleware, controller.getTree);
   router.put('/tree', authMiddleware, validate(saveTreeSchema), controller.saveTree);
 
+  // Biblioteca de iconos: los SVG con nombre que viven en la tabla `icons`.
+  // PÚBLICO (sin auth) a propósito: la pantalla de login y el primer paint
+  // necesitan los iconos antes de autenticarse, y un SVG no es sensible.
+  router.get('/icons', async (_req, res, next) => {
+    try {
+      if (!(await db.schema.hasTable('icons'))) {
+        res.json({ icons: [] });
+        return;
+      }
+      const icons = await db('icons')
+        .whereNotNull('name')
+        .select('id', 'name', 'svg')
+        .orderBy('name');
+      res.json({ icons });
+    } catch (e) {
+      next(e);
+    }
+  });
+
   return router;
 };

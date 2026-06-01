@@ -10,13 +10,15 @@ const knexConfig = require('./config/database');
 const errorHandler = require('./shared/errors/error.handler');
 const buildModuleXRoutes = require('./modules/module-x/adapters/entry/module-x.routes');
 const buildAuthRoutes = require('./modules/auth/adapters/entry/auth.routes');
-const buildMeRoutes = require('./modules/me/adapters/entry/me.routes');
+const buildMeRoutes = require('./modules/preferences/adapters/entry/me.routes');
 const buildUsersRoutes = require('./modules/users/adapters/entry/users.routes');
 const buildNavigationRoutes = require('./modules/navigation/adapters/entry/navigation.routes');
-const buildRolesRoutes = require('./modules/roles/adapters/entry/roles.routes');
+const buildRolesRoutes = require('./modules/roles-and-permissions/adapters/entry/roles.routes');
 const buildServicesRoutes = require('./modules/services/adapters/entry/services.routes');
 const buildRealtimeRoutes = require('./shared/realtime/realtime.routes');
 const buildLoginContentRoutes = require('./modules/login-content/login-content.routes');
+const buildBuilderRoutes = require('./modules/page-builder/builder.routes');
+const buildTestRunnerRoutes = require('./modules/test-runner/test-runner.routes');
 
 module.exports = function buildApp() {
   const db = knex(knexConfig[env.nodeEnv] || knexConfig.development);
@@ -44,6 +46,8 @@ module.exports = function buildApp() {
   app.use('/api/events', buildRealtimeRoutes(db));
   app.use('/api/module-x', buildModuleXRoutes(db));
   app.use('/api/login-content', buildLoginContentRoutes(db));
+  app.use('/api/builder', buildBuilderRoutes(db));
+  app.use('/api/test-runner', buildTestRunnerRoutes(db));
 
   app.use((req, res) => res.status(404).json({ error: 'NOT_FOUND', path: req.path }));
   app.use(errorHandler);

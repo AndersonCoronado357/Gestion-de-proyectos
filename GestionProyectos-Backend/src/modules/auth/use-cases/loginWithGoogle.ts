@@ -17,8 +17,8 @@ import type { UserRepositoryPort } from '../ports/user.repository';
 import {
   DEFAULT_PREFERENCES,
   type UiPreferences
-} from '../../me/domain/preferences.types';
-import type { PreferencesRepositoryPort } from '../../me/ports/preferences.repository';
+} from '../../preferences/domain/preferences.types';
+import type { PreferencesRepositoryPort } from '../../preferences/ports/preferences.repository';
 import { realtime } from '../../../shared/realtime/adapters/sse.adapter';
 
 const AppError = require('../../../shared/errors/app.error');
