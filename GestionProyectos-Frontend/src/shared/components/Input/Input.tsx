@@ -6,7 +6,7 @@ import {
   type ReactNode
 } from 'react';
 import { cn } from '../../lib/cn.js';
-import { EyeIcon, EyeOffIcon } from '../icons/index.js';
+import { EyeIcon, EyeOffIcon } from '../../icons/index.js';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: ReactNode;
@@ -56,7 +56,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             leftIcon ? 'pl-9' : 'pl-3',
             isPassword || rightIcon ? 'pr-9' : 'pr-3',
             hasError
-              ? 'bg-red-50 text-red-700 placeholder:text-red-300 dark:bg-red-500/15 dark:text-red-300 dark:placeholder:text-red-400/50'
+              ? 'bg-danger-surface text-danger-text placeholder:text-danger-text/50   '
               : 'bg-bg-muted text-fg placeholder:text-fg-faint',
             className
           )}
@@ -86,7 +86,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       </div>
 
       {hasError ? (
-        <p className="mt-1.5 text-[12px] text-red-600 dark:text-red-400">{error}</p>
+        <p className="mt-1.5 text-[12px] text-danger-text">{error}</p>
       ) : hint ? (
         <p className="mt-1.5 text-[12px] text-fg-subtle">{hint}</p>
       ) : null}

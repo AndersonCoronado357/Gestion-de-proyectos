@@ -9,7 +9,7 @@ import {
   arrayMove,
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
-import { GripIcon } from '../icons/index.js';
+import { GripIcon } from '../../icons/index.js';
 import { useSortableItem, useSortableSensors } from './sortable.js';
 
 interface SortableRowProps {

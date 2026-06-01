@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { cn } from '../../lib/cn.js';
-import { GripIcon } from '../icons/index.js';
+import { GripIcon } from '../../icons/index.js';
 import { useSortableItem, useSortableSensors } from './sortable.js';
 
 export interface ZoneMovePayload {
@@ -138,7 +138,7 @@ function DraggableItem<T>({
       style={style}
       {...attributes}
       {...listeners}
-      className="group relative flex items-center gap-2 rounded-md bg-bg px-3 py-2 ring-1 ring-border-subtle transition-colors"
+      className="group relative flex items-center gap-2 rounded-md bg-bg-muted px-3 py-2 transition-colors"
     >
       <span
         aria-hidden="true"

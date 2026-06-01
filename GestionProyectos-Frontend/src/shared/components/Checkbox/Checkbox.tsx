@@ -12,7 +12,7 @@
 
 import type { ReactNode } from 'react';
 import { cn } from '../../lib/cn.js';
-import { CheckIcon } from '../icons/index.js';
+import { CheckIcon } from '../../icons/index.js';
 
 export type CheckboxVariant = 'inline' | 'card';
 

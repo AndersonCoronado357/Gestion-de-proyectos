@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { cn } from '../../lib/cn.js';
-import { ChevronRightIcon } from '../icons/index.js';
+import { ChevronRightIcon } from '../../icons/index.js';
 
 const WEEKDAYS_ES = ['L', 'M', 'X', 'J', 'V', 'S', 'D'] as const;
 const MONTHS_ES = [

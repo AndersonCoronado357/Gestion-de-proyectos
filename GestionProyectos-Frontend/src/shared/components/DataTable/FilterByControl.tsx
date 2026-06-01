@@ -8,7 +8,7 @@ import {
 import { createPortal } from 'react-dom';
 import { cn } from '../../lib/cn.js';
 import { useCloseOnScroll } from '../../lib/useCloseOnScroll.js';
-import { ChevronDownIcon } from '../icons/index.js';
+import { ChevronDownIcon } from '../../icons/index.js';
 import type { ColumnDef } from './DataTable.js';
 
 function FunnelIcon(props: SVGProps<SVGSVGElement>) {
@@ -254,8 +254,8 @@ export default function FilterByControl<T>({
           title="Limpiar filtro"
           className={cn(
             'inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full outline-none transition-colors',
-            'text-fg-faint hover:bg-red-50 hover:text-red-600',
-            'dark:hover:bg-red-500/15 dark:hover:text-red-400'
+            'text-fg-faint hover:bg-danger-surface hover:text-danger-text',
+            ''
           )}
         >
           <ClearIcon />

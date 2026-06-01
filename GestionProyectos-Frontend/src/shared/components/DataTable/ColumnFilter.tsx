@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../../lib/cn.js';
 import { useCloseOnScroll } from '../../lib/useCloseOnScroll.js';
-import { ChevronDownIcon, CheckIcon } from '../icons/index.js';
+import { ChevronDownIcon, CheckIcon } from '../../icons/index.js';
 import SearchInput from '../SearchInput/index.js';
 import type { ColumnDef } from './DataTable.js';
 

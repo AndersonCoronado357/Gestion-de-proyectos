@@ -31,8 +31,8 @@ const TYPES: Record<AlertType, AlertTypeMeta> = {
   error: {
     title: 'Error',
     confirmText: 'INTENTAR DE NUEVO',
-    iconBg: 'bg-red-600',
-    btn: 'bg-red-600 hover:bg-red-700',
+    iconBg: 'bg-danger',
+    btn: 'bg-danger hover:bg-danger-hover',
     icon: (
       <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round">
         <path d="M18 6 6 18" pathLength={1} className="icon-draw" style={drawStyle(150)} />
@@ -43,8 +43,8 @@ const TYPES: Record<AlertType, AlertTypeMeta> = {
   warning: {
     title: 'Advertencia',
     confirmText: 'REVISAR',
-    iconBg: 'bg-amber-500',
-    btn: 'bg-amber-500 hover:bg-amber-600',
+    iconBg: 'bg-warning',
+    btn: 'bg-warning hover:bg-warning-hover',
     icon: (
       <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
         <path

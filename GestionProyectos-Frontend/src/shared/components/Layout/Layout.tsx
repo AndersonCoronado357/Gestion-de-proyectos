@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../Sidebar/index.js';
 import Header from '../Header/index.js';
+import GlobalContentSearch from '../../search/GlobalContentSearch.js';
 import {
   buildSidebarItems,
   findActiveContextIn,
@@ -133,7 +134,10 @@ export default function Layout({ children }: LayoutProps) {
           onLogout={handleLogout}
           onMenu={() => setMobileOpen(true)}
         />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <GlobalContentSearch targetId="app-content" />
+        <main id="app-content" className="flex-1 overflow-y-auto">
+          {children}
+        </main>
       </div>
     </div>
   );

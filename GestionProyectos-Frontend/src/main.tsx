@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.js';
 import { ThemeProvider } from './shared/theme/ThemeContext.js';
 import { ToastProvider } from './shared/components/Toast/index.js';
+import { IconsProvider } from './shared/icons/index.js';
 import { AuthProvider } from './modules/auth/ui/AuthContext.js';
 import { NavigationProvider } from './modules/navigation/NavigationContext.js';
 import { SearchProvider } from './shared/search/SearchContext.js';
@@ -18,6 +19,7 @@ if (!container) {
 ReactDOM.createRoot(container).render(
   <React.StrictMode>
     <ThemeProvider>
+      <IconsProvider>
       <ToastProvider>
         <BrowserRouter
           basename="/"
@@ -43,6 +45,7 @@ ReactDOM.createRoot(container).render(
           </SearchProvider>
         </BrowserRouter>
       </ToastProvider>
+      </IconsProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

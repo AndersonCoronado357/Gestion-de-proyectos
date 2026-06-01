@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { cn } from '../../lib/cn.js';
-import { ChevronRightIcon, BoxIcon } from '../icons/index.jsx';
+import { ChevronRightIcon, BoxIcon } from '../../icons/index.jsx';
 import type { SidebarChild, SidebarItem as SidebarItemType } from './sidebar.config.js';
 
 export interface SidebarItemProps {

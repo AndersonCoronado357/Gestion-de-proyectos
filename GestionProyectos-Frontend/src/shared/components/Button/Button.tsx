@@ -27,13 +27,13 @@ const variants: Record<ButtonVariant, string> = {
   ghost:
     'bg-transparent text-fg-muted hover:bg-surface-hover hover:text-fg focus-visible:ring-fg-faint/40',
   danger:
-    'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500/30',
+    'bg-danger text-white hover:bg-danger-hover active:bg-danger-hover focus-visible:ring-danger/30',
   // Success usa el color primary del tema: si el usuario cambia el primary
   // en Settings, success se adapta automáticamente.
   success:
     'bg-primary text-on-primary hover:bg-primary-700 active:bg-primary-800 focus-visible:ring-primary/30',
   warning:
-    'bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 focus-visible:ring-amber-400/30',
+    'bg-warning text-white hover:bg-warning-hover active:bg-warning-hover focus-visible:ring-warning/30',
 
   // Outline: borde, texto y fill en hover usan EXACTAMENTE el mismo color.
   'outline-primary':
@@ -41,9 +41,9 @@ const variants: Record<ButtonVariant, string> = {
   'outline-success':
     'border-2 border-primary bg-transparent font-semibold text-primary hover:bg-primary hover:text-on-primary focus-visible:ring-primary/30',
   'outline-danger':
-    'border-2 border-red-600 bg-transparent font-semibold text-red-600 hover:bg-red-600 hover:text-white focus-visible:ring-red-500/30 dark:border-red-500 dark:text-red-400 dark:hover:bg-red-500 dark:hover:text-white',
+    'border-2 border-danger bg-transparent font-semibold text-danger-text hover:bg-danger hover:text-white focus-visible:ring-danger/30',
   'outline-warning':
-    'border-2 border-amber-500 bg-transparent font-semibold text-amber-500 hover:bg-amber-500 hover:text-white focus-visible:ring-amber-400/30 dark:text-amber-400 dark:hover:bg-amber-500 dark:hover:text-white'
+    'border-2 border-warning bg-transparent font-semibold text-warning-text hover:bg-warning hover:text-white focus-visible:ring-warning/30'
 };
 
 const sizes: Record<ButtonSize, string> = {

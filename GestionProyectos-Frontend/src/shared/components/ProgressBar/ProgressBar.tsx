@@ -8,8 +8,8 @@ export type ProgressBarSize = 'sm' | 'md';
 const VARIANTS: Record<ProgressBarVariant, string> = {
   primary: 'bg-primary',
   success: 'bg-primary',
-  warning: 'bg-amber-500',
-  danger: 'bg-red-500'
+  warning: 'bg-warning',
+  danger: 'bg-danger'
 };
 
 const SIZES: Record<ProgressBarSize, string> = {

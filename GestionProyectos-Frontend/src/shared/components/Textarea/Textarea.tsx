@@ -47,7 +47,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         />
 
         {hasError ? (
-          <p className="mt-1.5 text-[12px] text-red-600 dark:text-red-400">{error}</p>
+          <p className="mt-1.5 text-[12px] text-danger-text">{error}</p>
         ) : hint ? (
           <p className="mt-1.5 text-[12px] text-fg-subtle">{hint}</p>
         ) : null}

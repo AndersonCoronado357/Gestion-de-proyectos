@@ -12,7 +12,7 @@ import {
   ChevronDownIcon,
   CheckIcon,
   SearchIcon
-} from '../icons/index.js';
+} from '../../icons/index.js';
 
 const POPUP_MARGIN = 8;
 const DEFAULT_HEIGHT = 300;
@@ -264,7 +264,7 @@ export default function Select<V extends string | number = string>({
       </button>
 
       {error ? (
-        <p className="mt-1.5 text-[12px] text-red-600">{error}</p>
+        <p className="mt-1.5 text-[12px] text-danger-text">{error}</p>
       ) : hint ? (
         <p className="mt-1.5 text-[12px] text-fg-subtle">{hint}</p>
       ) : null}

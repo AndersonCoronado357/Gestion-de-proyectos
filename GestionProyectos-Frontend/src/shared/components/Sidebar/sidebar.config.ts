@@ -6,7 +6,7 @@
 // administrable.
 
 import type { ComponentType, SVGProps } from 'react';
-import { SettingsIcon, HomeIcon } from '../icons/index.js';
+import { SettingsIcon, HomeIcon } from '../../icons/index.js';
 import type {
   ModuleNode,
   SubmoduleNode

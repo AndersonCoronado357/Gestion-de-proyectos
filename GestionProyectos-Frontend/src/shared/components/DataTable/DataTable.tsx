@@ -28,6 +28,8 @@ export interface DataTableProps<T = unknown> {
   initialPageSize?: number;
   searchPlaceholder?: string;
   emptyMessage?: ReactNode;
+  /** Oculta la barra de búsqueda/filtros: deja sólo la tabla + paginación. */
+  hideToolbar?: boolean;
 }
 
 interface SortArrowProps {
@@ -77,7 +79,8 @@ export default function DataTable<T>({
   onRowClick,
   initialPageSize = 10,
   searchPlaceholder = 'Buscar',
-  emptyMessage = 'Sin datos'
+  emptyMessage = 'Sin datos',
+  hideToolbar = false
 }: DataTableProps<T>) {
   // Tres fuentes de filtrado, todas combinadas con AND:
   //   1. `headerQuery` — el SearchInput global del header (contexto).
@@ -96,6 +99,9 @@ export default function DataTable<T>({
   const filterableColumns = columns.filter((c) => c.filter === 'select');
 
   const filtered = useMemo(() => {
+    // Tabla plana (sin toolbar): no aplica búsqueda/filtros, sólo muestra
+    // los datos (igual se ordenan y paginan).
+    if (hideToolbar) return data;
     const hq = headerQuery.trim().toLowerCase();
     const lq = localQuery.trim().toLowerCase();
     const fq = activeFilter.value.trim().toLowerCase();
@@ -118,7 +124,7 @@ export default function DataTable<T>({
       }
       return true;
     });
-  }, [data, headerQuery, localQuery, activeFilter, columns]);
+  }, [data, headerQuery, localQuery, activeFilter, columns, hideToolbar]);
 
   const sorted = useMemo(() => {
     if (!sort.column) return filtered;
@@ -153,30 +159,32 @@ export default function DataTable<T>({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden">
-      <div className="flex shrink-0 flex-wrap items-center gap-3 px-3 pt-4 pb-3 sm:flex-nowrap sm:px-5">
-        {filterableColumns.length > 0 && (
-          <FilterByControl
-            filterableColumns={filterableColumns}
-            data={data}
-            columnId={activeFilter.columnId}
-            value={activeFilter.value}
-            onChange={setActiveFilter}
-          />
-        )}
+    <div data-search-skip className="flex h-full min-h-0 flex-col overflow-hidden">
+      {!hideToolbar && (
+        <div className="flex shrink-0 flex-wrap items-center gap-3 px-3 pt-4 pb-3 sm:flex-nowrap sm:px-5">
+          {filterableColumns.length > 0 && (
+            <FilterByControl
+              filterableColumns={filterableColumns}
+              data={data}
+              columnId={activeFilter.columnId}
+              value={activeFilter.value}
+              onChange={setActiveFilter}
+            />
+          )}
 
-        {/* Buscador GENERAL local de la tabla (a la derecha).  Combina con
-            el del header — escribir en cualquiera de los dos filtra; la
-            tabla queda con la intersección.  Es útil cuando querés
-            filtrar SOLO esta tabla sin tocar el resto de la app. */}
-        <div className="ml-auto w-72 max-w-full">
-          <SearchInput
-            value={localQuery}
-            onChange={(e) => setLocalQuery(e.target.value)}
-            placeholder={searchPlaceholder}
-          />
+          {/* Buscador GENERAL local de la tabla (a la derecha).  Combina con
+              el del header — escribir en cualquiera de los dos filtra; la
+              tabla queda con la intersección.  Es útil cuando querés
+              filtrar SOLO esta tabla sin tocar el resto de la app. */}
+          <div className="ml-auto w-72 max-w-full">
+            <SearchInput
+              value={localQuery}
+              onChange={(e) => setLocalQuery(e.target.value)}
+              placeholder={searchPlaceholder}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Móvil: cada fila como tarjeta apilada — sin scroll horizontal. La
           1ª columna va de "cabecera" y el resto como pares etiqueta/valor. */}
@@ -189,15 +197,8 @@ export default function DataTable<T>({
             style={{ animationDelay: `${i * 12}ms` }}
             className="block w-full animate-[slide-up-fade_180ms_ease-out_both] rounded-xl bg-bg-muted p-3.5 text-left outline-none transition-colors active:bg-primary-500/10"
           >
-            {columns[0] && (
-              <div className="mb-2.5">
-                {columns[0].render
-                  ? columns[0].render(row)
-                  : ((columns[0].accessor(row) as ReactNode) ?? '—')}
-              </div>
-            )}
             <div className="space-y-1.5">
-              {columns.slice(1).map((c) => (
+              {columns.map((c) => (
                 <div
                   key={c.id}
                   className="flex items-start justify-between gap-3"
@@ -257,6 +258,12 @@ export default function DataTable<T>({
                         align === 'right' && 'flex-row-reverse'
                       )}
                     >
+                      {/* Spacer del ancho de la flecha (9px): en columnas
+                          centradas mantiene la etiqueta centrada sobre la
+                          columna (la flecha no la desplaza). */}
+                      {align === 'center' && c.sortable !== false && (
+                        <span aria-hidden="true" className="w-[9px] shrink-0" />
+                      )}
                       {c.label}
                       {c.sortable !== false && (
                         <SortArrow

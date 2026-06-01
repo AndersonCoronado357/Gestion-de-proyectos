@@ -4,7 +4,7 @@ import {
   ChevronDownIcon,
   UserCircleIcon,
   LogoutIcon
-} from '../icons/index.js';
+} from '../../icons/index.js';
 
 export type UserMenuVariant = 'default' | 'on-dark';
 
@@ -128,7 +128,7 @@ export default function UserMenu({
           type="button"
           role="menuitem"
           onClick={handle(onLogout)}
-          className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-[12.5px] font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/15"
+          className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-[12.5px] font-medium text-danger-text transition-colors hover:bg-danger-surface  dark:hover:bg-danger-surface"
         >
           <LogoutIcon width={16} height={16} />
           Cerrar sesión

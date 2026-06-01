@@ -56,8 +56,8 @@ const TYPES: Record<ToastType, ToastTypeMeta> = {
     )
   },
   error: {
-    bar: 'bg-red-600',
-    iconColor: 'text-red-600',
+    bar: 'bg-danger',
+    iconColor: 'text-danger-text',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" width={28} height={28}>
         <circle cx={12} cy={12} r={10} pathLength={1} className="icon-draw" style={ds(150)} />
@@ -67,8 +67,8 @@ const TYPES: Record<ToastType, ToastTypeMeta> = {
     )
   },
   warning: {
-    bar: 'bg-amber-500',
-    iconColor: 'text-amber-500',
+    bar: 'bg-warning',
+    iconColor: 'text-warning-text',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" width={28} height={28}>
         <circle cx={12} cy={12} r={10} pathLength={1} className="icon-draw" style={ds(150)} />

@@ -1,6 +1,6 @@
 import { forwardRef, type InputHTMLAttributes } from 'react';
 import { cn } from '../../lib/cn.js';
-import { SearchIcon } from '../icons/index.js';
+import { SearchIcon } from '../../icons/index.js';
 import './SearchInput.css';
 
 export type SearchInputVariant = 'default' | 'on-dark';

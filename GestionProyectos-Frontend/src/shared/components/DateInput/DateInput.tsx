@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../../lib/cn.js';
 import { useCloseOnScroll } from '../../lib/useCloseOnScroll.js';
-import { CalendarIcon } from '../icons/index.js';
+import { CalendarIcon } from '../../icons/index.js';
 import Calendar from '../Calendar/index.js';
 
 const CAL_WIDTH = 280;
@@ -119,7 +119,7 @@ export default function DateInput({
         className={cn(
           'flex h-9 w-full items-center gap-2 rounded-md px-3 text-[12.5px] outline-none transition-colors',
           hasError
-            ? 'bg-red-50 text-red-700 dark:bg-red-500/15 dark:text-red-300'
+            ? 'bg-danger-surface text-danger-text  '
             : 'bg-bg-muted text-fg',
           open && 'ring-2 ring-primary/20'
         )}
@@ -127,7 +127,7 @@ export default function DateInput({
         <CalendarIcon
           width={14}
           height={14}
-          className={cn('shrink-0', hasError ? 'text-red-500' : 'text-fg-faint')}
+          className={cn('shrink-0', hasError ? 'text-danger-text' : 'text-fg-faint')}
         />
         <span className={cn('flex-1 text-left', !value && 'text-fg-faint')}>
           {formatted || placeholder}
@@ -135,7 +135,7 @@ export default function DateInput({
       </button>
 
       {hasError ? (
-        <p className="mt-1.5 text-[12px] text-red-600 dark:text-red-400">{error}</p>
+        <p className="mt-1.5 text-[12px] text-danger-text">{error}</p>
       ) : hint ? (
         <p className="mt-1.5 text-[12px] text-fg-subtle">{hint}</p>
       ) : null}
