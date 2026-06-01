@@ -48,7 +48,26 @@ module.exports = {
           hover: channel('--color-sidebar-hover'),
           active: channel('--color-sidebar-active')
         },
-        page: channel('--color-page-bg')
+        page: channel('--color-page-bg'),
+        danger: {
+          DEFAULT: channel('--color-danger'),
+          hover: channel('--color-danger-hover'),
+          text: channel('--color-danger-text'),
+          surface: channel('--color-danger-surface')
+        },
+        warning: {
+          DEFAULT: channel('--color-warning'),
+          hover: channel('--color-warning-hover'),
+          text: channel('--color-warning-text'),
+          surface: channel('--color-warning-surface')
+        },
+        success: {
+          DEFAULT: channel('--color-success'),
+          hover: channel('--color-success-hover'),
+          text: channel('--color-success-text'),
+          surface: channel('--color-success-surface')
+        },
+        'table-header': channel('--color-table-header')
       },
       fontSize: {
         // Sólo escala el font-size — alturas/paddings/gaps siguen en rem

@@ -166,7 +166,18 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [accentHex, setAccentHexState] = useState(DEFAULT_ACCENT);
   const [fontFamilyId, setFontFamilyIdState] = useState(DEFAULT_FONT);
   const [fontSize, setFontSizeState] = useState<FontSize>(DEFAULT_SIZE);
-  const [mode, setModeState] = useState<ThemeMode>(DEFAULT_MODE);
+  // Inicializa el modo desde la cookie anti-flash (`gp-mode`): así el PRIMER
+  // render de React ya usa el modo correcto y NO parpadea a claro antes de
+  // que AuthContext aplique el tema de la BD. La BD sigue siendo la verdad.
+  const [mode, setModeState] = useState<ThemeMode>(() => {
+    try {
+      const m = document.cookie.match(/(?:^|;\s*)gp-mode=(dark|light)/);
+      if (m) return m[1] as ThemeMode;
+    } catch {
+      /* sin document */
+    }
+    return DEFAULT_MODE;
+  });
 
   useEffect(() => {
     if (!isValidHex(accentHex)) return;
@@ -194,6 +205,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       root.style.setProperty(k, v);
     });
     root.dataset.theme = mode;
+
+    // Pista anti-flash: el script inline de index.html lee esta cookie para
+    // aplicar el modo ANTES del primer paint. La verdad sigue en la BD.
+    try {
+      document.cookie = `gp-mode=${mode};path=/;max-age=31536000;samesite=lax`;
+    } catch {
+      /* sin document (tests) */
+    }
   }, [accentHex, mode]);
 
   useEffect(() => {

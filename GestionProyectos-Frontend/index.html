@@ -11,6 +11,34 @@
       /auth/me resuelve, el ThemeContext aplica el tema del usuario. El
       ViewSkeleton del AuthContext cubre ese instante de carga.
     -->
+    <script>
+      // Anti-flash de tema: aplica el modo (claro/oscuro) ANTES del primer
+      // paint, leyendo la cookie `gp-mode` que escribe el ThemeContext. La
+      // fuente de verdad sigue siendo la BD; esto sólo evita el parpadeo.
+      (function () {
+        try {
+          var m = (document.cookie.match(/(?:^|;\s*)gp-mode=(dark|light)/) || [])[1];
+          var el = document.documentElement;
+          if (m) el.setAttribute('data-theme', m);
+          if (m === 'dark') {
+            var d = {
+              '--color-bg': '10 18 24',
+              '--color-bg-muted': '17 29 40',
+              '--color-fg': '244 247 252',
+              '--color-fg-muted': '210 218 230',
+              '--color-fg-subtle': '160 172 190',
+              '--color-fg-faint': '120 135 155',
+              '--color-surface-hover': '21 37 51',
+              '--color-border': '24 41 56',
+              '--color-border-subtle': '15 25 35',
+              '--color-page-bg': '6 10 13'
+            };
+            for (var k in d) el.style.setProperty(k, d[k]);
+            el.style.backgroundColor = 'rgb(6 10 13)';
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
