@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { cn } from '../../../../shared/lib/cn.js';
-import { ChevronRightIcon } from '../../../../shared/components/icons/index.jsx';
+import { ChevronRightIcon } from '../../../../shared/icons/index.jsx';
 import Input from '../../../../shared/components/Input/index.js';
 
 export interface ForgotPasswordFormProps {

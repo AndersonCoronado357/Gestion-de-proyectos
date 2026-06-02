@@ -25,6 +25,6 @@ export default function ModuleXListPage() {
   }, [list]);
 
   if (loading) return <p>Cargando...</p>;
-  if (err) return <p className="text-red-600">{err.message}</p>;
+  if (err) return <p className="text-danger-text">{err.message}</p>;
   return <ModuleXList items={data.items} />;
 }

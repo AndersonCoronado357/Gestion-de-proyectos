@@ -223,7 +223,7 @@ export default function UsersPage() {
             <p
               className={cn(
                 'mt-0.5 text-[11px]',
-                builder.error ? 'text-red-600' : 'text-fg-faint'
+                builder.error ? 'text-danger-text' : 'text-fg-faint'
               )}
             >
               {subtitle}

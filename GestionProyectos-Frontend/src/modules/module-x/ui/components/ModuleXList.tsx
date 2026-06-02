@@ -6,7 +6,7 @@ export interface ModuleXListProps {
 }
 
 export default function ModuleXList({ items = [] }: ModuleXListProps) {
-  if (!items.length) return <p className="text-slate-500">Sin elementos.</p>;
+  if (!items.length) return <p className="text-fg-faint">Sin elementos.</p>;
   return (
     <ul className="space-y-2">
       {items.map((it) => (

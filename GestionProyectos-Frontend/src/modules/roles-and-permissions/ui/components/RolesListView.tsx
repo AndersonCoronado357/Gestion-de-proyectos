@@ -4,7 +4,7 @@ import {
   PlusIcon,
   TrashIcon,
   ShieldIcon
-} from '../../../../shared/components/icons/index.jsx';
+} from '../../../../shared/icons/index.jsx';
 import SearchInput from '../../../../shared/components/SearchInput/index.js';
 import { isPlaceholderRoleName } from '../hooks/useRolesBuilder.js';
 
@@ -134,7 +134,7 @@ export default function RolesListView({
                       }
                     }}
                     title="Eliminar rol"
-                    className="self-center shrink-0 rounded-md p-1 text-fg-faint outline-none opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 dark:hover:bg-red-500/15 dark:hover:text-red-400"
+                    className="self-center shrink-0 rounded-md p-1 text-fg-faint outline-none opacity-0 transition hover:bg-danger-surface hover:text-danger-text group-hover:opacity-100 "
                   >
                     <TrashIcon width={13} height={13} />
                   </span>

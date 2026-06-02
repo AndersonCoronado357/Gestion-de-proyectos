@@ -4,7 +4,7 @@ import FontFamilyList from '../components/FontFamilyList.jsx';
 import FontSizeSelector from '../components/FontSizeSelector.jsx';
 import ModeToggle from '../components/ModeToggle.jsx';
 import ColorPicker from '../../../../shared/components/ColorPicker/index.js';
-import { FolderPlusIcon } from '../../../../shared/components/icons/index.jsx';
+import { FolderPlusIcon } from '../../../../shared/icons/index.jsx';
 
 interface CardProps {
   title: import('react').ReactNode;

@@ -1,5 +1,5 @@
 import { cn } from '../../../../shared/lib/cn.js';
-import { HeartPulseIcon } from '../../../../shared/components/icons/index.jsx';
+import { HeartPulseIcon } from '../../../../shared/icons/index.jsx';
 
 const content = {
   login: {

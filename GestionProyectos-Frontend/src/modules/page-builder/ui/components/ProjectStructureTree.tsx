@@ -14,7 +14,7 @@ import {
   FileIcon,
   ChevronDownIcon,
   ChevronRightIcon
-} from '../../../../shared/components/icons/index.js';
+} from '../../../../shared/icons/index.js';
 
 type NodeKind = 'folder' | 'file';
 
@@ -451,8 +451,13 @@ export default function ProjectStructureTree({
     });
   };
 
+  // Colapsar / expandir TODAS las carpetas de un golpe.
+  const allCollapsed = expanded.size === 0;
+  const toggleAll = () =>
+    setExpanded(allCollapsed ? new Set(collectAllFolderPaths(TREE)) : new Set());
+
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex flex-col lg:h-full lg:min-h-0">
       <div className="flex shrink-0 items-center gap-2 border-b border-border-subtle px-3 py-2.5">
         <button
           type="button"
@@ -466,8 +471,23 @@ export default function ProjectStructureTree({
         <p className="min-w-0 flex-1 truncate text-[11.5px] font-semibold text-fg">
           Estructura del proyecto
         </p>
+        <button
+          type="button"
+          onClick={toggleAll}
+          className="inline-flex h-7 shrink-0 items-center gap-1 rounded-md px-1.5 text-[11px] font-medium text-fg-muted outline-none transition-colors hover:bg-bg-muted hover:text-fg"
+        >
+          <ChevronDownIcon
+            width={11}
+            height={11}
+            className={cn(
+              'shrink-0 transition-transform',
+              allCollapsed ? '' : 'rotate-180'
+            )}
+          />
+          {allCollapsed ? 'Expandir todo' : 'Colapsar todo'}
+        </button>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto py-2">
+      <div className="py-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         {TREE.map((node) => (
           <TreeRow
             key={node.name}

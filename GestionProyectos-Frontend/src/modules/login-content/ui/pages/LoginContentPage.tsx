@@ -13,7 +13,7 @@ import {
   useSortableItem,
   useSortableSensors
 } from '../../../../shared/components/DragDropList/index.js';
-import { GripIcon } from '../../../../shared/components/icons/index.js';
+import { GripIcon } from '../../../../shared/icons/index.js';
 import { cn } from '../../../../shared/lib/cn.js';
 import LoginPanel, {
   CIRCLE_LAYOUT_COUNT,
@@ -215,8 +215,8 @@ function SaveBadge({ status }: { status: SaveStatus }) {
   }
   if (status === 'error') {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-red-600">
-        <span className="h-1.5 w-1.5 rounded-full bg-red-600" />
+      <span className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-danger-text">
+        <span className="h-1.5 w-1.5 rounded-full bg-danger" />
         Error al guardar
       </span>
     );
@@ -336,7 +336,7 @@ function MessageRow({ item, index, slides, onUpdate, onSetBg, onRemove }: Messag
               onClick={onRemove}
               title="Quitar"
               aria-label="Quitar"
-              className="flex h-7 w-7 items-center justify-center rounded-md text-fg-faint transition-colors hover:bg-red-50 hover:text-red-600"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-fg-faint transition-colors hover:bg-danger-surface hover:text-danger-text"
             >
               <svg viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 6h18" />

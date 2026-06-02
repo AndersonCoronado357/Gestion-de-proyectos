@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type SVGProps } from 'react';
 import { cn } from '../../../../shared/lib/cn.js';
-import { TrashIcon } from '../../../../shared/components/icons/index.js';
+import { TrashIcon } from '../../../../shared/icons/index.js';
 import SearchInput from '../../../../shared/components/SearchInput/index.js';
 import ModuleSection from './ModuleSection.js';
 import CargosList from './CargosList.js';
@@ -187,8 +187,8 @@ export default function RoleDetailView({
             title="Eliminar rol"
             className={cn(
               'ml-auto inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md outline-none transition',
-              'text-fg-faint hover:bg-red-50 hover:text-red-600',
-              'dark:hover:bg-red-500/15 dark:hover:text-red-400'
+              'text-fg-faint hover:bg-danger-surface hover:text-danger-text',
+              ''
             )}
           >
             <TrashIcon width={14} height={14} />

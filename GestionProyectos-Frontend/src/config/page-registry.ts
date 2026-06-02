@@ -13,13 +13,15 @@ import RolesAndPermissionsPage from '../modules/roles-and-permissions/ui/pages/R
 import UsersPage from '../modules/users/ui/pages/UsersPage.js';
 import ComponentsPage from '../modules/components/ui/pages/ComponentsPage.js';
 import LoginContentPage from '../modules/login-content/ui/pages/LoginContentPage.js';
+import TestRunnerPage from '../modules/test-runner/ui/pages/TestRunnerPage.js';
 
 export const PAGE_REGISTRY: Record<string, ComponentType> = {
   'modules-and-submodules': ModulesBuilderPage,
   'roles-and-permissions': RolesAndPermissionsPage,
   users: UsersPage,
   components: ComponentsPage,
-  'login-content': LoginContentPage
+  'login-content': LoginContentPage,
+  'test-runner': TestRunnerPage
 };
 
 export function resolvePage(folderKey: string | null): ComponentType | null {

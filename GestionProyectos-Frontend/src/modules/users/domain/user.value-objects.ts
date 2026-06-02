@@ -19,23 +19,23 @@ export const PRESENCE_META: readonly PresenceMeta[] = [
   {
     id: 'online',
     label: 'Conectado',
-    dot: 'bg-emerald-500',
-    text: 'text-emerald-700 dark:text-emerald-300',
-    bg: 'bg-emerald-50 dark:bg-emerald-500/15'
+    dot: 'bg-success',
+    text: 'text-success-text',
+    bg: 'bg-success-surface'
   },
   {
     id: 'away',
     label: 'Ausente',
-    dot: 'bg-amber-500',
-    text: 'text-amber-700 dark:text-amber-300',
-    bg: 'bg-amber-50 dark:bg-amber-500/15'
+    dot: 'bg-warning',
+    text: 'text-warning-text',
+    bg: 'bg-warning-surface'
   },
   {
     id: 'offline',
     label: 'Sin iniciar sesión',
-    dot: 'bg-slate-400',
-    text: 'text-slate-600 dark:text-slate-300',
-    bg: 'bg-slate-100 dark:bg-slate-500/20'
+    dot: 'bg-fg-faint',
+    text: 'text-fg-muted',
+    bg: 'bg-bg-muted'
   }
 ] as const;
 

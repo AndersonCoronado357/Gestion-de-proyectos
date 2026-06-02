@@ -86,7 +86,7 @@ export default function LoginForm({
           {errorMessage && (
             <p
               role="alert"
-              className="rounded-md bg-red-50 px-3 py-2 text-[11.5px] font-medium text-red-700"
+              className="rounded-md bg-danger-surface px-3 py-2 text-[11.5px] font-medium text-danger-text"
             >
               {errorMessage}
             </p>

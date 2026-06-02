@@ -88,7 +88,7 @@ export default function UserSidePanel({
           type="button"
           onClick={onClose}
           title="Cerrar panel"
-          className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-fg-faint outline-none transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/15 dark:hover:text-red-400"
+          className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-fg-faint outline-none transition-colors hover:bg-danger-surface hover:text-danger-text "
         >
           <CloseIcon />
         </button>

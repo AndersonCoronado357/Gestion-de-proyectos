@@ -4,7 +4,7 @@ import { cn } from '../../../../shared/lib/cn.js';
 import {
   FolderIcon,
   GripIcon
-} from '../../../../shared/components/icons/index.jsx';
+} from '../../../../shared/icons/index.jsx';
 import SearchInput from '../../../../shared/components/SearchInput/index.js';
 import { matchesQuery } from '../../../../shared/search/SearchContext.js';
 

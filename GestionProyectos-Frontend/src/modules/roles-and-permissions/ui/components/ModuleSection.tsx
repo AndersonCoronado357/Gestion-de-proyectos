@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { cn } from '../../../../shared/lib/cn.js';
-import { ChevronRightIcon } from '../../../../shared/components/icons/index.jsx';
+import { ChevronRightIcon } from '../../../../shared/icons/index.jsx';
 import { PERMISSION_ACTIONS } from '../../domain/permission.value-objects.js';
 import SubmoduleRow from './SubmoduleRow.jsx';
 

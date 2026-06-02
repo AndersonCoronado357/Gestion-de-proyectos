@@ -19,23 +19,13 @@ import { useToast } from '../../../../shared/components/Toast/index.js';
 import { useTheme } from '../../../../shared/theme/ThemeContext.jsx';
 import {
   PlusIcon,
-  SearchIcon,
   TrashIcon,
   CheckIcon,
-  BellIcon,
-  CalendarIcon,
-  UserCircleIcon,
-  SettingsIcon,
-  HeartPulseIcon,
-  ShieldIcon,
   MailIcon,
-  LockIcon,
-  ChevronRightIcon,
-  ChevronDownIcon,
-  PatientsIcon,
-  AppointmentsIcon,
-  PharmacyIcon
-} from '../../../../shared/components/icons/index.jsx';
+  LockIcon
+} from '../../../../shared/icons/index.jsx';
+import { http } from '../../../../shared/utils/http.js';
+import SimpleTable, { type SimpleColumn } from '../../../../shared/components/SimpleTable/index.js';
 
 function InputsPreview() {
   const [text, setText] = useState('');
@@ -50,12 +40,12 @@ function InputsPreview() {
   // Chrome/Firefox no inyecten la password guardada del login.
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <Input label="Texto" placeholder="Anderson Coronado" value={text} onChange={(e) => setText(e.target.value)} autoComplete="off" />
+      <Input label="Texto" placeholder="Texto de ejemplo" value={text} onChange={(e) => setText(e.target.value)} autoComplete="off" />
       <Input label="Email" type="email" placeholder="correo@dominio.com" leftIcon={<MailIcon width={14} height={14} />} value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="off" />
       <Input label="Contraseña" type="password" placeholder="••••••••" leftIcon={<LockIcon width={14} height={14} />} value={pass} onChange={(e) => setPass(e.target.value)} autoComplete="new-password" />
       <Input label="Número" type="number" placeholder="0" value={num} onChange={(e) => setNum(e.target.value)} autoComplete="off" />
       <Input label="Teléfono" type="tel" placeholder="+57 300 000 0000" value={tel} onChange={(e) => setTel(e.target.value)} autoComplete="off" />
-      <Input label="URL" type="url" placeholder="https://gestionproyectos.com" autoComplete="off" />
+      <Input label="URL" type="url" placeholder="https://ejemplo.com" autoComplete="off" />
       <Input label="Con error" placeholder="correo@dominio.com" defaultValue="correo-invalido" error="Formato inválido" leftIcon={<MailIcon width={14} height={14} />} autoComplete="off" />
       <Input label="Con hint" placeholder="Cualquier valor" hint="Texto de ayuda secundario" autoComplete="off" />
     </div>
@@ -108,18 +98,18 @@ function SelectPreview() {
           label="Con buscador"
           searchable
           options={[
-            'Cardiología',
-            'Pediatría',
-            'Ginecología',
-            'Dermatología',
-            'Neurología',
-            'Oncología',
-            'Ortopedia',
-            'Psiquiatría'
-          ].map((v) => ({ value: v.toLowerCase(), label: v }))}
+            'Opción 1',
+            'Opción 2',
+            'Opción 3',
+            'Opción 4',
+            'Opción 5',
+            'Opción 6',
+            'Opción 7',
+            'Opción 8'
+          ].map((v) => ({ value: v.toLowerCase().replace(' ', ''), label: v }))}
           value={b}
           onChange={setB}
-          placeholder="Buscar especialidad"
+          placeholder="Buscar opción"
         />
       </div>
     </div>
@@ -165,6 +155,36 @@ function DataTablePreview() {
   return (
     <div className="h-[360px] w-full overflow-hidden rounded-lg ring-1 ring-border-subtle">
       <DataTable data={data} columns={columns} initialPageSize={5} />
+    </div>
+  );
+}
+
+// SimpleTable — tabla limpia (cabecera barra + filas alternadas), datos demo
+// genéricos (nada que parezca real).
+function SimpleTablePreview() {
+  const cols: SimpleColumn<DemoRow>[] = [
+    { id: 'c1', label: 'Columna A', render: (r) => r.c1, width: 200 },
+    { id: 'c2', label: 'Columna B', render: (r) => r.c2 },
+    { id: 'c3', label: 'Columna C', render: (r) => r.c3 },
+    { id: 'c4', label: 'Columna D', render: (r) => r.c4 },
+    { id: 'c5', label: 'Columna E', render: (r) => r.c5 },
+    { id: 'c6', label: 'Columna F', render: (r) => r.c6 }
+  ];
+  const data: DemoRow[] = Array.from({ length: 16 }, (_, i) => {
+    const n = i + 1;
+    return {
+      id: String(n),
+      c1: `Dato ${n}.1`,
+      c2: `Dato ${n}.2`,
+      c3: `Dato ${n}.3`,
+      c4: `Dato ${n}.4`,
+      c5: `Dato ${n}.5`,
+      c6: `Dato ${n}.6`
+    };
+  });
+  return (
+    <div className="h-[360px] w-full">
+      <SimpleTable data={data} columns={cols} initialPageSize={10} />
     </div>
   );
 }
@@ -322,7 +342,7 @@ function DateInputPreview() {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div className="w-full max-w-[280px]">
         <DateInput
-          label="Fecha de cita"
+          label="Fecha"
           value={date}
           onChange={setDate}
           placeholder="DD/MM/AAAA"
@@ -365,22 +385,22 @@ function CheckboxPreview() {
         <div className="flex w-full max-w-[420px] flex-col gap-2">
           <Checkbox
             variant="card"
-            label="Ubicación del episodio"
-            description="Agrega los datos de la ubicación actual del episodio."
+            label="Opción con descripción A"
+            description="Texto descriptivo de ejemplo para la primera opción."
             checked={extUbi}
             onChange={setExtUbi}
           />
           <Checkbox
             variant="card"
-            label="Datos del último episodio"
-            description="Agrega los datos del último episodio del paciente."
+            label="Opción con descripción B"
+            description="Texto descriptivo de ejemplo para la segunda opción."
             checked={extUlt}
             onChange={setExtUlt}
           />
           <Checkbox
             variant="card"
-            label="Diagnósticos del episodio"
-            description="Agrega los diagnósticos asociados al episodio."
+            label="Opción con descripción C"
+            description="Texto descriptivo de ejemplo para la tercera opción."
             checked={extDiag}
             onChange={setExtDiag}
           />
@@ -391,26 +411,26 @@ function CheckboxPreview() {
 }
 
 function SwitchPreview() {
-  type Centro = 'MED' | 'RIO';
+  type Centro = 'o1' | 'o2';
   type Ambiente = 'DEV' | 'QAS' | 'PRD';
-  type Modo = 'paciente' | 'documento' | 'episodio' | 'externo';
-  const [centro, setCentro] = useState<Centro>('MED');
+  type Modo = 't1' | 't2' | 't3' | 't4';
+  const [centro, setCentro] = useState<Centro>('o1');
   const [ambiente, setAmbiente] = useState<Ambiente>('DEV');
-  const [modo, setModo] = useState<Modo>('paciente');
+  const [modo, setModo] = useState<Modo>('t1');
   return (
     <div className="flex w-full max-w-[440px] flex-col gap-5">
       <Switch<Centro>
-        label="Sede"
+        label="Opciones"
         options={[
-          { value: 'MED', label: 'Medellín' },
-          { value: 'RIO', label: 'Rionegro' }
+          { value: 'o1', label: 'Opción 1' },
+          { value: 'o2', label: 'Opción 2' }
         ]}
         value={centro}
         onChange={setCentro}
         hint={
-          centro === 'MED'
-            ? 'Gestión de Proyectos · Medellín'
-            : 'Gestión de Proyectos · Rionegro'
+          centro === 'o1'
+            ? 'Opción 1 seleccionada'
+            : 'Opción 2 seleccionada'
         }
       />
       <Switch<Ambiente>
@@ -424,12 +444,12 @@ function SwitchPreview() {
         onChange={setAmbiente}
       />
       <Switch<Modo>
-        label="Consultar por (4 opciones)"
+        label="Selección (4 opciones)"
         options={[
-          { value: 'paciente', label: 'Paciente' },
-          { value: 'documento', label: 'Documento' },
-          { value: 'episodio', label: 'Episodio' },
-          { value: 'externo', label: 'Externo' }
+          { value: 't1', label: 'Tipo 1' },
+          { value: 't2', label: 'Tipo 2' },
+          { value: 't3', label: 'Tipo 3' },
+          { value: 't4', label: 'Tipo 4' }
         ]}
         value={modo}
         onChange={setModo}
@@ -450,11 +470,11 @@ function SwitchPreview() {
 
 function DragDropReorderPreview() {
   const [items, setItems] = useState([
-    { id: '1', label: 'María García' },
-    { id: '2', label: 'Juan Pérez' },
-    { id: '3', label: 'Camila Restrepo' },
-    { id: '4', label: 'Diego Mejía' },
-    { id: '5', label: 'Laura Ríos' }
+    { id: '1', label: 'Elemento 1' },
+    { id: '2', label: 'Elemento 2' },
+    { id: '3', label: 'Elemento 3' },
+    { id: '4', label: 'Elemento 4' },
+    { id: '5', label: 'Elemento 5' }
   ]);
   return (
     <div className="w-full max-w-[360px]">
@@ -472,15 +492,15 @@ function DragDropReorderPreview() {
 
 function DragDropZonesPreview() {
   const [pendientes, setPendientes] = useState([
-    { id: 'p1', label: 'Revisar historia clínica' },
-    { id: 'p2', label: 'Agendar resonancia' },
-    { id: 'p3', label: 'Confirmar cita' }
+    { id: 'p1', label: 'Tarea 1' },
+    { id: 'p2', label: 'Tarea 2' },
+    { id: 'p3', label: 'Tarea 3' }
   ]);
   const [enCurso, setEnCurso] = useState([
-    { id: 'e1', label: 'Atención de urgencias' }
+    { id: 'e1', label: 'Tarea 4' }
   ]);
   const [hechas, setHechas] = useState([
-    { id: 'h1', label: 'Triaje paciente A' }
+    { id: 'h1', label: 'Tarea 5' }
   ]);
 
   const zones = {
@@ -534,6 +554,47 @@ function DragDropZonesPreview() {
   );
 }
 
+// Iconos: SIEMPRE desde la base de datos (tabla `icons`), no hardcodeados.
+function IconsPreview() {
+  const [icons, setIcons] = useState<
+    { id: number; name: string | null; svg: string }[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    http<{ icons: { id: number; name: string | null; svg: string }[] }>(
+      '/navigation/icons'
+    )
+      .then((d) => setIcons(d?.icons ?? []))
+      .catch(() => setIcons([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading)
+    return <p className="text-[12px] text-fg-faint">Cargando iconos…</p>;
+  if (icons.length === 0)
+    return (
+      <p className="text-[12px] text-fg-faint">
+        No hay iconos en la base de datos.
+      </p>
+    );
+  return (
+    <div className="flex flex-wrap gap-2 text-fg-subtle">
+      {icons.map((ic) => (
+        <span
+          key={ic.id}
+          title={ic.name ?? ''}
+          className="flex h-9 w-9 items-center justify-center rounded-md ring-1 ring-border-subtle"
+        >
+          <span
+            className="block h-[18px] w-[18px] [&>svg]:h-full [&>svg]:w-full"
+            dangerouslySetInnerHTML={{ __html: ic.svg }}
+          />
+        </span>
+      ))}
+    </div>
+  );
+}
+
 const CATALOG = [
   {
     id: 'button',
@@ -568,6 +629,11 @@ const CATALOG = [
   { id: 'select', name: 'Select (select2)', preview: () => <SelectPreview /> },
   { id: 'color-picker', name: 'ColorPicker', preview: () => <ColorPickerPreview /> },
   { id: 'data-table', name: 'DataTable', preview: () => <DataTablePreview /> },
+  {
+    id: 'simple-table',
+    name: 'SimpleTable (listado limpio)',
+    preview: () => <SimpleTablePreview />
+  },
   { id: 'progress-bar', name: 'LoadingBar', preview: () => <ProgressPreview /> },
   { id: 'skeleton', name: 'Skeleton', preview: () => <SkeletonPreview /> },
   { id: 'loader', name: 'Loader', preview: () => <LoaderPreview /> },
@@ -581,37 +647,8 @@ const CATALOG = [
   { id: 'toasts', name: 'Toast (notificaciones)', preview: () => <ToastPreview /> },
   {
     id: 'icons',
-    name: 'Iconos',
-    preview: () => (
-      <div className="flex flex-wrap gap-2 text-fg-subtle">
-        {[
-          PlusIcon,
-          SearchIcon,
-          TrashIcon,
-          CheckIcon,
-          BellIcon,
-          CalendarIcon,
-          UserCircleIcon,
-          SettingsIcon,
-          HeartPulseIcon,
-          ShieldIcon,
-          MailIcon,
-          LockIcon,
-          ChevronRightIcon,
-          ChevronDownIcon,
-          PatientsIcon,
-          AppointmentsIcon,
-          PharmacyIcon
-        ].map((Icon, i) => (
-          <span
-            key={i}
-            className="flex h-9 w-9 items-center justify-center rounded-md ring-1 ring-border-subtle"
-          >
-            <Icon width={16} height={16} />
-          </span>
-        ))}
-      </div>
-    )
+    name: 'Iconos (biblioteca BD)',
+    preview: () => <IconsPreview />
   }
 ];
 

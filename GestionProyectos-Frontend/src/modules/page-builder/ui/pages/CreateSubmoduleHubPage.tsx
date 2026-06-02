@@ -4,7 +4,7 @@
 // submódulo se escribe directamente en el "título" del card derecho
 // (input estilo título, autoFocus, sin label aparte).
 
-import { useState, type ComponentType } from 'react';
+import { useEffect, useState, type ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../../../shared/lib/cn.js';
 import Button from '../../../../shared/components/Button/index.js';
@@ -16,8 +16,10 @@ import {
   KeyIcon,
   ChevronRightIcon,
   PlusIcon
-} from '../../../../shared/components/icons/index.js';
+} from '../../../../shared/icons/index.js';
 import ProjectStructureTree from '../components/ProjectStructureTree.js';
+import { http } from '../../../../shared/utils/http.js';
+import { useToast } from '../../../../shared/components/Toast/index.js';
 
 interface Section {
   id: 'db' | 'front' | 'logic' | 'apis' | 'perms';
@@ -60,19 +62,66 @@ const SECTIONS: ReadonlyArray<Section> = [
   }
 ];
 
+const PENDING_TOAST_KEY = 'gp:builder-created';
+
 export default function CreateSubmoduleHubPage() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
+  const [creating, setCreating] = useState(false);
+  const toast = useToast();
+
+  // Crea el submódulo: el backend (solo dev) genera su estructura de archivos.
+  // OJO: al crear la carpeta en src/modules, Vite hace full-reload (se lleva el
+  // toast). Por eso lo dejamos pendiente y lo mostramos al re-montar (efecto).
+  const handleCreate = async () => {
+    const n = name.trim();
+    if (!n || creating) return;
+    setCreating(true);
+    try {
+      await http('/builder/submodule', { method: 'POST', body: { name: n } });
+      sessionStorage.setItem(
+        PENDING_TOAST_KEY,
+        JSON.stringify({ name: n, at: Date.now() })
+      );
+      setName('');
+    } catch (e) {
+      toast.error({
+        title: 'No se pudo crear el submódulo',
+        message: e instanceof Error ? e.message : 'Inténtalo de nuevo.'
+      });
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  // Tras el full-reload de Vite, mostramos el toast que quedó pendiente.
+  useEffect(() => {
+    const raw = sessionStorage.getItem(PENDING_TOAST_KEY);
+    if (!raw) return;
+    sessionStorage.removeItem(PENDING_TOAST_KEY);
+    try {
+      const { name: created, at } = JSON.parse(raw) as { name: string; at: number };
+      if (created && Date.now() - at < 15000) {
+        toast.success({
+          title: 'Submódulo creado',
+          message: `"${created}" ya está en el proyecto.`
+        });
+      }
+    } catch {
+      /* ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto bg-page p-4 lg:flex-row lg:overflow-hidden lg:p-6">
       {/* ── Card 1: estructura del proyecto (con Volver arriba) ── */}
-      <aside className="flex max-h-[45vh] w-full shrink-0 flex-col overflow-hidden rounded-xl bg-bg shadow-sm lg:h-full lg:max-h-none lg:w-[300px]">
+      <aside className="order-last flex w-full shrink-0 flex-col overflow-hidden rounded-xl bg-bg shadow-sm lg:order-none lg:h-full lg:w-[300px]">
         <ProjectStructureTree name={name} onBack={() => navigate(-1)} />
       </aside>
 
       {/* ── Card 2: header (input-título) + 3 opciones ── */}
-      <main className="flex w-full flex-col overflow-hidden rounded-xl bg-bg shadow-sm lg:min-h-0 lg:flex-1">
+      <main className="flex w-full flex-col rounded-xl bg-bg shadow-sm lg:min-h-0 lg:flex-1 lg:overflow-hidden">
         {/* Header: input título (el nombre del submódulo), centrado. */}
         <div className="flex shrink-0 items-center justify-center border-b border-border-subtle px-5 py-3">
           <input
@@ -124,14 +173,10 @@ export default function CreateSubmoduleHubPage() {
             variant="primary"
             size="sm"
             leftIcon={<PlusIcon width={13} height={13} strokeWidth={2.5} />}
-            disabled={!name.trim()}
-            onClick={() => {
-              // Wiring del create real va acá cuando lo definamos.
-              // Por ahora solo log para no romper nada.
-              console.log('Crear submódulo:', name.trim());
-            }}
+            disabled={!name.trim() || creating}
+            onClick={handleCreate}
           >
-            Crear submódulo
+            {creating ? 'Creando submódulo…' : 'Crear submódulo'}
           </Button>
         </div>
       </main>

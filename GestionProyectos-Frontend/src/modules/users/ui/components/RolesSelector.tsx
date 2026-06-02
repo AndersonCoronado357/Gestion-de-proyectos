@@ -7,7 +7,7 @@ import {
   ChevronDownIcon,
   TrashIcon,
   SearchIcon
-} from '../../../../shared/components/icons/index.js';
+} from '../../../../shared/icons/index.js';
 
 const POPUP_MARGIN = 8;
 const DESIRED_HEIGHT = 300;
@@ -225,8 +225,8 @@ export default function RolesSelector({
                   title="Quitar rol"
                   className={cn(
                     'inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full outline-none opacity-0 transition-colors group-hover:opacity-100',
-                    'text-fg-faint hover:bg-red-50 hover:text-red-600',
-                    'dark:hover:bg-red-500/15 dark:hover:text-red-400'
+                    'text-fg-faint hover:bg-danger-surface hover:text-danger-text',
+                    ''
                   )}
                 >
                   <TrashIcon width={11} height={11} />

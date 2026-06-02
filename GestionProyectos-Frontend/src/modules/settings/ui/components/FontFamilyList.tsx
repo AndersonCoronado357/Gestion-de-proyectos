@@ -1,5 +1,5 @@
 import { cn } from '../../../../shared/lib/cn.js';
-import { CheckIcon } from '../../../../shared/components/icons/index.jsx';
+import { CheckIcon } from '../../../../shared/icons/index.jsx';
 
 const PREVIEW = 'Texto de prueba con esta letra';
 

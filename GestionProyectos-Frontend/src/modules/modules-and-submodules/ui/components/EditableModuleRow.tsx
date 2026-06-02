@@ -8,7 +8,7 @@ import {
   ChevronRightIcon,
   TrashIcon,
   GripIcon
-} from '../../../../shared/components/icons/index.jsx';
+} from '../../../../shared/icons/index.jsx';
 import { useSortableItem } from '../../../../shared/components/DragDropList/index.js';
 import IconPasteButton from './IconPasteButton.jsx';
 
@@ -73,7 +73,7 @@ function SubmoduleRow({ sub, parentId, readOnly, onRemove, onIconChange }) {
             type="button"
             onClick={onRemove}
             title="Quitar"
-            className="rounded-md p-1 text-fg-faint outline-none opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 dark:hover:bg-red-500/15 dark:hover:text-red-400"
+            className="rounded-md p-1 text-fg-faint outline-none opacity-0 transition hover:bg-danger-surface hover:text-danger-text group-hover:opacity-100 "
           >
             <TrashIcon width={12} height={12} />
           </button>
@@ -210,7 +210,7 @@ export default function EditableModuleRow({
             }}
             onPointerDown={(e) => e.stopPropagation()}
             title="Eliminar módulo"
-            className="rounded-md p-1 text-fg-faint outline-none opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 dark:hover:bg-red-500/15 dark:hover:text-red-400"
+            className="rounded-md p-1 text-fg-faint outline-none opacity-0 transition hover:bg-danger-surface hover:text-danger-text group-hover:opacity-100 "
           >
             <TrashIcon width={12} height={12} />
           </button>

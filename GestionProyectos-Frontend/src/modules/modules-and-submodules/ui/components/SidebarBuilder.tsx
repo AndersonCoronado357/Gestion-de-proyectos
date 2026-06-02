@@ -4,7 +4,7 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { cn } from '../../../../shared/lib/cn.js';
-import { PlusIcon } from '../../../../shared/components/icons/index.jsx';
+import { PlusIcon } from '../../../../shared/icons/index.jsx';
 import EditableModuleRow from './EditableModuleRow.jsx';
 import {
   matchesQuery,

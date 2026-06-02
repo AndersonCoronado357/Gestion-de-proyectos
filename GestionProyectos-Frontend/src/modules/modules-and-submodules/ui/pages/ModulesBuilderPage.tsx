@@ -20,7 +20,7 @@ import {
   FolderIcon,
   GripIcon,
   PlusIcon
-} from '../../../../shared/components/icons/index.js';
+} from '../../../../shared/icons/index.js';
 import { useSortableSensors } from '../../../../shared/components/DragDropList/index.js';
 
 type DragActiveItem =
@@ -78,9 +78,9 @@ function AutosaveStatus({
     return (
       <span
         title={error ?? undefined}
-        className="inline-flex items-center gap-1.5 text-[11px] font-medium text-red-600"
+        className="inline-flex items-center gap-1.5 text-[11px] font-medium text-danger-text"
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-red-600" />
+        <span className="h-1.5 w-1.5 rounded-full bg-danger" />
         Error al guardar
       </span>
     );

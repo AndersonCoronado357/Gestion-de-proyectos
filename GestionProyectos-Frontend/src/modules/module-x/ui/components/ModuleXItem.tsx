@@ -1,8 +1,8 @@
-﻿export default function ModuleXItem({ item }) {
+export default function ModuleXItem({ item }) {
   return (
-    <li className="rounded border border-slate-200 bg-white p-3">
+    <li className="rounded border border-border-subtle bg-bg p-3">
       <div className="font-medium">{item.name}</div>
-      {item.description && <div className="text-sm text-slate-600">{item.description}</div>}
+      {item.description && <div className="text-sm text-fg-muted">{item.description}</div>}
     </li>
   );
 }

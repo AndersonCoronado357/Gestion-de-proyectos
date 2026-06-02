@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.js';
 import { env } from '../../../../config/env.js';
-import { GoogleIcon } from '../../../../shared/components/icons/index.js';
+import { GoogleIcon } from '../../../../shared/icons/index.js';
 import SocialButton from './SocialButton.js';
 import { cn } from '../../../../shared/lib/cn.js';
 
@@ -126,7 +126,7 @@ export default function GoogleSignInButton() {
           className="absolute inset-0 z-10 overflow-hidden opacity-0"
         />
       </div>
-      {error && <p className="mt-2 text-center text-[12px] text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-center text-[12px] text-danger-text">{error}</p>}
     </div>
   );
 }

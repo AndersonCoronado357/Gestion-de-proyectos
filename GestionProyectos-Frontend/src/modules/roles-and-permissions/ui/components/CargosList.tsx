@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { cn } from '../../../../shared/lib/cn.js';
-import { CheckIcon } from '../../../../shared/components/icons/index.js';
+import { CheckIcon } from '../../../../shared/icons/index.js';
 import SearchInput from '../../../../shared/components/SearchInput/index.js';
 
 export interface CargoOption {

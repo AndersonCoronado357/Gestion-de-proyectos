@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../../../../shared/lib/cn.js';
-import { BoxIcon } from '../../../../shared/components/icons/index.js';
+import { BoxIcon } from '../../../../shared/icons/index.js';
 import { normalizeSvg, isLikelySvg } from '../lib/svg.js';
 
 export interface IconPasteButtonProps {
@@ -105,7 +105,7 @@ export default function IconPasteButton({
                   <button
                     type="button"
                     onClick={clear}
-                    className="h-7 rounded-md px-2 text-[11px] font-medium text-fg-muted outline-none transition-colors hover:text-red-600"
+                    className="h-7 rounded-md px-2 text-[11px] font-medium text-fg-muted outline-none transition-colors hover:text-danger-text"
                   >
                     Quitar
                   </button>
