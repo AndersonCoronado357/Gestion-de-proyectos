@@ -9,7 +9,11 @@ import { AuthProvider } from './modules/auth/ui/AuthContext.js';
 import { NavigationProvider } from './modules/navigation/NavigationContext.js';
 import { SearchProvider } from './shared/search/SearchContext.js';
 import { PreferencesSync } from './modules/preferences/PreferencesSync.js';
+import { installAutoCapture } from './modules/logs/autoCapture.js';
 import './index.css';
+
+// Captura de logs / errores / HTTP — debe instalarse ANTES del render.
+installAutoCapture();
 
 const container = document.getElementById('root');
 if (!container) {

@@ -14,6 +14,7 @@ import UsersPage from '../modules/users/ui/pages/UsersPage.js';
 import ComponentsPage from '../modules/components/ui/pages/ComponentsPage.js';
 import LoginContentPage from '../modules/login-content/ui/pages/LoginContentPage.js';
 import TestRunnerPage from '../modules/test-runner/ui/pages/TestRunnerPage.js';
+import LogsPage from '../modules/logs/ui/pages/LogsPage.js';
 
 export const PAGE_REGISTRY: Record<string, ComponentType> = {
   'modules-and-submodules': ModulesBuilderPage,
@@ -21,7 +22,8 @@ export const PAGE_REGISTRY: Record<string, ComponentType> = {
   users: UsersPage,
   components: ComponentsPage,
   'login-content': LoginContentPage,
-  'test-runner': TestRunnerPage
+  'test-runner': TestRunnerPage,
+  logs: LogsPage
 };
 
 export function resolvePage(folderKey: string | null): ComponentType | null {
