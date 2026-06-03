@@ -28,7 +28,10 @@ out/
 *.local
 
 # ── Logs ─────────────────────────────────────────────────────
-logs/
+# Sólo carpetas `logs/` runtime (en la raíz o dentro de paquetes), no los
+# módulos `modules/logs/` del frontend/backend que sí queremos versionar.
+/logs/
+**/runtime-logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
