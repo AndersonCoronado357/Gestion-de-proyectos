@@ -36,7 +36,8 @@ interface SelectPosition {
 export interface SelectProps<V = string> {
   options: ReadonlyArray<SelectOptionInput<V>>;
   value: V | null | undefined;
-  onChange?: (value: V) => void;
+  /** Se llama con el valor elegido, o con `null` al pulsar la "X" interna. */
+  onChange?: (value: V | null) => void;
   placeholder?: string;
   searchable?: boolean;
   label?: ReactNode;
@@ -116,8 +117,9 @@ export default function Select<V extends string | number = string>({
       Math.min(above ? spaceAbove - HEADER_H : spaceBelow, desiredHeight)
     );
     if (above) {
+      // Solapa 1px sobre el borde superior del botón → sin gap visual.
       setPos({
-        bottom: window.innerHeight - rect.top + 4,
+        bottom: window.innerHeight - rect.top - 1,
         top: undefined,
         left: rect.left,
         width: rect.width,
@@ -125,8 +127,9 @@ export default function Select<V extends string | number = string>({
         above
       });
     } else {
+      // Solapa 1px sobre el borde inferior del botón → sin gap visual.
       setPos({
-        top: rect.bottom + 4,
+        top: rect.bottom - 1,
         bottom: undefined,
         left: rect.left,
         width: rect.width,
@@ -162,7 +165,12 @@ export default function Select<V extends string | number = string>({
           <div
             id="select-popup-anchor"
             ref={popupRef}
-            className="fixed z-[100] flex flex-col overflow-hidden rounded-lg bg-bg shadow-lg ring-1 ring-black/5"
+            className={cn(
+              'fixed z-[100] flex flex-col overflow-hidden bg-bg shadow-lg ring-1 ring-black/5',
+              // Sin redondear el lado que toca al input → se ve como una
+              // extensión del botón, no como una pieza separada.
+              pos.above ? 'rounded-t-lg' : 'rounded-b-lg'
+            )}
             style={{
               top: pos.top,
               bottom: pos.bottom,
@@ -187,7 +195,7 @@ export default function Select<V extends string | number = string>({
                 />
               </div>
             )}
-            <ul className="min-h-0 flex-1 overflow-y-auto py-1">
+            <ul className="min-h-0 flex-1 overflow-y-auto">
               {filtered.map((it) => {
                 const active = it.value === value;
                 return (
@@ -242,9 +250,51 @@ export default function Select<V extends string | number = string>({
         disabled={disabled}
         className={cn(
           'flex h-9 w-full items-center justify-between gap-2 rounded-md bg-bg-muted px-3 outline-none transition-colors',
+          // Cuando el dropdown está abierto, quitar el redondeo del lado
+          // que toca el popup → forma una sola pieza visual con él.
+          open && (pos.above ? 'rounded-t-none' : 'rounded-b-none'),
           disabled && 'cursor-not-allowed opacity-60'
         )}
       >
+        {/* X interna — va ANTES del texto (a la izquierda). Aparece sólo
+            cuando hay selección; sin selección queda invisible pero
+            conserva su espacio para que el ancho NO cambie entre estados.
+            Es un <span role="button"> para no anidar <button> (HTML inválido). */}
+        <span
+          role="button"
+          tabIndex={selected && !disabled ? 0 : -1}
+          aria-label="Limpiar selección"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (selected && !disabled) onChange?.(null);
+          }}
+          onKeyDown={(e) => {
+            if (selected && !disabled && (e.key === 'Enter' || e.key === ' ')) {
+              e.preventDefault();
+              e.stopPropagation();
+              onChange?.(null);
+            }
+          }}
+          className={cn(
+            'flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-fg-faint transition-all duration-150',
+            selected
+              ? 'cursor-pointer opacity-100 hover:bg-bg hover:text-fg-muted active:scale-90'
+              : 'pointer-events-none opacity-0'
+          )}
+        >
+          <svg
+            width={9}
+            height={9}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.4}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </span>
         <span
           className={cn(
             'min-w-0 flex-1 truncate text-left text-[12.5px]',

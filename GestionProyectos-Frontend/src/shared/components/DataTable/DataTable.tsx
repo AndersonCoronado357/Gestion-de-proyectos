@@ -30,6 +30,8 @@ export interface DataTableProps<T = unknown> {
   emptyMessage?: ReactNode;
   /** Oculta la barra de búsqueda/filtros: deja sólo la tabla + paginación. */
   hideToolbar?: boolean;
+  /** Oculta sólo el buscador local de la tabla (mantiene el "Filtrar por"). */
+  hideLocalSearch?: boolean;
 }
 
 interface SortArrowProps {
@@ -80,7 +82,8 @@ export default function DataTable<T>({
   initialPageSize = 10,
   searchPlaceholder = 'Buscar',
   emptyMessage = 'Sin datos',
-  hideToolbar = false
+  hideToolbar = false,
+  hideLocalSearch = false
 }: DataTableProps<T>) {
   // Tres fuentes de filtrado, todas combinadas con AND:
   //   1. `headerQuery` — el SearchInput global del header (contexto).
@@ -175,14 +178,18 @@ export default function DataTable<T>({
           {/* Buscador GENERAL local de la tabla (a la derecha).  Combina con
               el del header — escribir en cualquiera de los dos filtra; la
               tabla queda con la intersección.  Es útil cuando querés
-              filtrar SOLO esta tabla sin tocar el resto de la app. */}
-          <div className="ml-auto w-72 max-w-full">
-            <SearchInput
-              value={localQuery}
-              onChange={(e) => setLocalQuery(e.target.value)}
-              placeholder={searchPlaceholder}
-            />
-          </div>
+              filtrar SOLO esta tabla sin tocar el resto de la app. Se puede
+              ocultar con `hideLocalSearch` si la página ya tiene su propio
+              buscador encima. */}
+          {!hideLocalSearch && (
+            <div className="ml-auto w-72 max-w-full">
+              <SearchInput
+                value={localQuery}
+                onChange={(e) => setLocalQuery(e.target.value)}
+                placeholder={searchPlaceholder}
+              />
+            </div>
+          )}
         </div>
       )}
 
