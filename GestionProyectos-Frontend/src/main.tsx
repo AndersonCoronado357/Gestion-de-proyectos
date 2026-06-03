@@ -16,7 +16,9 @@ if (!container) {
   throw new Error('No #root element found in index.html');
 }
 
-ReactDOM.createRoot(container).render(
+const root = ReactDOM.createRoot(container);
+
+root.render(
   <React.StrictMode>
     <ThemeProvider>
       <IconsProvider>

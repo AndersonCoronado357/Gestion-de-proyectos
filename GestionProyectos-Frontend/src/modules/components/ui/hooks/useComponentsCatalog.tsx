@@ -4,6 +4,26 @@ import Input from '../../../../shared/components/Input/index.js';
 import SearchInput from '../../../../shared/components/SearchInput/index.js';
 import ColorPicker from '../../../../shared/components/ColorPicker/index.js';
 import DataTable, { type ColumnDef } from '../../../../shared/components/DataTable/index.js';
+import {
+  DonutChart,
+  BarChart,
+  MultiBarChart,
+  LineChart,
+  GanttChart,
+  Sparkline,
+  RadarChart,
+  PolarAreaChart,
+  ScatterChart,
+  BubbleChart,
+  ComboChart,
+  GaugeChart,
+  type ChartDatum,
+  type LineSeries,
+  type GanttTask,
+  type BarSeries,
+  type ScatterSeries,
+  type BubbleSeries
+} from '../../../../shared/components/Charts/index.js';
 import Textarea from '../../../../shared/components/Textarea/index.js';
 import Select from '../../../../shared/components/Select/index.js';
 import Skeleton from '../../../../shared/components/Skeleton/index.js';
@@ -185,6 +205,233 @@ function SimpleTablePreview() {
   return (
     <div className="h-[360px] w-full">
       <SimpleTable data={data} columns={cols} initialPageSize={10} />
+    </div>
+  );
+}
+
+function DonutChartPreview() {
+  const data: ChartDatum[] = [
+    { label: 'Categoría A', value: 45 },
+    { label: 'Categoría B', value: 30 },
+    { label: 'Categoría C', value: 15 },
+    { label: 'Categoría D', value: 10 }
+  ];
+  const [sel, setSel] = useState<number | null>(null);
+  return (
+    <div className="w-full max-w-[620px]">
+      <DonutChart
+        data={data}
+        centerValue="100"
+        centerLabel="Total"
+        onSelect={(i) => setSel((s) => (s === i ? null : i))}
+        selectedIndex={sel}
+      />
+    </div>
+  );
+}
+
+function BarChartPreview() {
+  const data: ChartDatum[] = [
+    { label: 'Categoría A', value: 32 },
+    { label: 'Categoría B', value: 24 },
+    { label: 'Categoría C', value: 41 },
+    { label: 'Categoría D', value: 18 },
+    { label: 'Categoría E', value: 29 }
+  ];
+  return (
+    <div className="flex w-full max-w-[780px] flex-col gap-10">
+      <BarChart data={data} />
+      <BarChart data={data.slice(0, 4)} orientation="horizontal" />
+    </div>
+  );
+}
+
+function LineChartPreview() {
+  const series: LineSeries[] = [
+    { label: 'Serie 1', points: [12, 18, 15, 24, 22, 30] },
+    { label: 'Serie 2', points: [8, 10, 14, 13, 19, 21] }
+  ];
+  const labels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6'];
+  return (
+    <div className="w-full max-w-[780px]">
+      <LineChart series={series} labels={labels} area showLegend />
+    </div>
+  );
+}
+
+function GanttChartPreview() {
+  const tasks: GanttTask[] = [
+    { label: 'Tarea 1', start: 0, end: 3 },
+    { label: 'Tarea 2', start: 2, end: 6 },
+    { label: 'Tarea 3', start: 4, end: 7 },
+    { label: 'Tarea 4', start: 6, end: 10 },
+    { label: 'Tarea 5', start: 8, end: 10 }
+  ];
+  return (
+    <div className="w-full max-w-[780px]">
+      <GanttChart tasks={tasks} total={10} />
+    </div>
+  );
+}
+
+function LineNoPointsPreview() {
+  const series: LineSeries[] = [
+    { label: 'Serie 1', points: [12, 18, 15, 24, 22, 30] },
+    { label: 'Serie 2', points: [8, 10, 14, 13, 19, 21] }
+  ];
+  const labels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6'];
+  return (
+    <div className="w-full max-w-[780px]">
+      <LineChart series={series} labels={labels} area showLegend showPoints={false} />
+    </div>
+  );
+}
+
+function SparklinePreview() {
+  const rows = [
+    { label: 'Serie A', value: '1.2k', points: [4, 6, 5, 8, 7, 10, 9, 12] },
+    { label: 'Serie B', value: '348', points: [10, 8, 9, 6, 7, 5, 6, 4] },
+    { label: 'Serie C', value: '92%', points: [3, 5, 4, 6, 8, 7, 9, 11] }
+  ];
+  return (
+    <div className="flex w-full max-w-[440px] flex-col gap-2">
+      {rows.map((r) => (
+        <div key={r.label} className="flex items-center gap-3 rounded-xl bg-bg-muted p-3">
+          <div className="w-20 shrink-0">
+            <div className="text-[11px] text-fg-faint">{r.label}</div>
+            <div className="text-[16px] font-bold text-fg">{r.value}</div>
+          </div>
+          <div className="min-w-0 flex-1">
+            <Sparkline points={r.points} height={40} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function RadarChartPreview() {
+  const labels = ['Velocidad', 'Calidad', 'Costo', 'Alcance', 'Riesgo', 'Soporte'];
+  const series: LineSeries[] = [
+    { label: 'Serie 1', points: [8, 6, 7, 9, 5, 8] },
+    { label: 'Serie 2', points: [5, 9, 6, 4, 8, 6] }
+  ];
+  return (
+    <div className="w-full max-w-[460px]">
+      <RadarChart labels={labels} series={series} />
+    </div>
+  );
+}
+
+function MultiBarPreview() {
+  const labels = ['Cat A', 'Cat B', 'Cat C', 'Cat D'];
+  const series: BarSeries[] = [
+    { label: 'Serie 1', data: [12, 19, 8, 15] },
+    { label: 'Serie 2', data: [8, 11, 14, 9] },
+    { label: 'Serie 3', data: [5, 7, 6, 12] }
+  ];
+  return (
+    <div className="flex w-full max-w-[780px] flex-col gap-10">
+      <MultiBarChart labels={labels} series={series} />
+      <MultiBarChart labels={labels} series={series} stacked />
+    </div>
+  );
+}
+
+function PolarAreaPreview() {
+  const data: ChartDatum[] = [
+    { label: 'Categoría A', value: 11 },
+    { label: 'Categoría B', value: 16 },
+    { label: 'Categoría C', value: 7 },
+    { label: 'Categoría D', value: 14 },
+    { label: 'Categoría E', value: 9 }
+  ];
+  const [sel, setSel] = useState<number | null>(null);
+  return (
+    <div className="w-full max-w-[620px]">
+      <PolarAreaChart
+        data={data}
+        onSelect={(i) => setSel((s) => (s === i ? null : i))}
+        selectedIndex={sel}
+      />
+    </div>
+  );
+}
+
+function ComboPreview() {
+  const labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
+  const bars: BarSeries[] = [{ label: 'Cantidad', data: [12, 19, 14, 22, 18, 26] }];
+  const line = { label: 'Tendencia', data: [10, 15, 16, 19, 21, 25] };
+  return (
+    <div className="w-full max-w-[780px]">
+      <ComboChart labels={labels} bars={bars} line={line} />
+    </div>
+  );
+}
+
+function ScatterPreview() {
+  const series: ScatterSeries[] = [
+    {
+      label: 'Serie 1',
+      points: [
+        { x: 5, y: 8 },
+        { x: 12, y: 14 },
+        { x: 18, y: 10 },
+        { x: 24, y: 22 },
+        { x: 30, y: 18 },
+        { x: 36, y: 28 }
+      ]
+    },
+    {
+      label: 'Serie 2',
+      points: [
+        { x: 8, y: 4 },
+        { x: 14, y: 9 },
+        { x: 22, y: 7 },
+        { x: 28, y: 15 },
+        { x: 34, y: 12 }
+      ]
+    }
+  ];
+  return (
+    <div className="w-full max-w-[680px]">
+      <ScatterChart series={series} />
+    </div>
+  );
+}
+
+function BubblePreview() {
+  const series: BubbleSeries[] = [
+    {
+      label: 'Serie 1',
+      points: [
+        { x: 10, y: 12, r: 8 },
+        { x: 20, y: 18, r: 16 },
+        { x: 30, y: 10, r: 10 },
+        { x: 40, y: 24, r: 22 }
+      ]
+    },
+    {
+      label: 'Serie 2',
+      points: [
+        { x: 15, y: 6, r: 12 },
+        { x: 25, y: 20, r: 9 },
+        { x: 35, y: 14, r: 18 }
+      ]
+    }
+  ];
+  return (
+    <div className="w-full max-w-[680px]">
+      <BubbleChart series={series} />
+    </div>
+  );
+}
+
+function GaugePreview() {
+  return (
+    <div className="grid w-full max-w-[620px] grid-cols-1 gap-4 sm:grid-cols-2">
+      <GaugeChart value={72} label="Avance" />
+      <GaugeChart value={45} label="Capacidad" />
     </div>
   );
 }
@@ -634,6 +881,19 @@ const CATALOG = [
     name: 'SimpleTable (listado limpio)',
     preview: () => <SimpleTablePreview />
   },
+  { id: 'chart-donut', name: 'DonutChart / Pastel', preview: () => <DonutChartPreview /> },
+  { id: 'chart-bar', name: 'BarChart (barras)', preview: () => <BarChartPreview /> },
+  { id: 'chart-line', name: 'LineChart (con puntos)', preview: () => <LineChartPreview /> },
+  { id: 'chart-line-clean', name: 'LineChart (sin puntos)', preview: () => <LineNoPointsPreview /> },
+  { id: 'chart-sparkline', name: 'Sparkline', preview: () => <SparklinePreview /> },
+  { id: 'chart-radar', name: 'RadarChart (araña)', preview: () => <RadarChartPreview /> },
+  { id: 'chart-multibar', name: 'MultiBarChart (agrupado / apilado)', preview: () => <MultiBarPreview /> },
+  { id: 'chart-polar', name: 'PolarAreaChart', preview: () => <PolarAreaPreview /> },
+  { id: 'chart-combo', name: 'ComboChart (barras + línea)', preview: () => <ComboPreview /> },
+  { id: 'chart-scatter', name: 'ScatterChart (dispersión)', preview: () => <ScatterPreview /> },
+  { id: 'chart-bubble', name: 'BubbleChart (burbujas)', preview: () => <BubblePreview /> },
+  { id: 'chart-gauge', name: 'GaugeChart (medidor)', preview: () => <GaugePreview /> },
+  { id: 'chart-gantt', name: 'GanttChart (cronograma)', preview: () => <GanttChartPreview /> },
   { id: 'progress-bar', name: 'LoadingBar', preview: () => <ProgressPreview /> },
   { id: 'skeleton', name: 'Skeleton', preview: () => <SkeletonPreview /> },
   { id: 'loader', name: 'Loader', preview: () => <LoaderPreview /> },
