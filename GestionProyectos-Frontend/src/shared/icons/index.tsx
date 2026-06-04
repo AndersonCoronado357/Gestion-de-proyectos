@@ -18,7 +18,9 @@ const make =
 
 export const HeartPulseIcon = make('HeartPulseIcon');
 export const ChevronRightIcon = make('ChevronRightIcon');
+export const ChevronLeftIcon = make('ChevronLeftIcon');
 export const ChevronDownIcon = make('ChevronDownIcon');
+export const CheckCircleIcon = make('CheckCircleIcon');
 export const SearchIcon = make('SearchIcon');
 export const DashboardIcon = make('DashboardIcon');
 export const HomeIcon = make('HomeIcon');

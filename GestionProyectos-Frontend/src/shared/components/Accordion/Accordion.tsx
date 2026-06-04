@@ -53,18 +53,26 @@ export default function Accordion({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className={cn(
-                  'h-3.5 w-3.5 shrink-0 text-fg-faint transition-transform',
+                  'h-3.5 w-3.5 shrink-0 text-fg-faint transition-transform duration-300',
                   on && 'rotate-90'
                 )}
               >
                 <path d="m9 6 6 6-6 6" />
               </svg>
             </button>
-            {on && (
-              <div className="px-4 pb-3.5 text-[12.5px] leading-relaxed text-fg-muted">
-                {it.content}
+            {/* Truco grid-rows-[0fr]/[1fr] → anima la altura sin medir DOM. */}
+            <div
+              className={cn(
+                'grid transition-all duration-300 ease-out',
+                on ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+              )}
+            >
+              <div className="min-h-0 overflow-hidden">
+                <div className="px-4 pb-3.5 text-[12.5px] leading-relaxed text-fg-muted">
+                  {it.content}
+                </div>
               </div>
-            )}
+            </div>
           </div>
         );
       })}
