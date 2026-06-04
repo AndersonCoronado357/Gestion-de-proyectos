@@ -10,7 +10,7 @@ import {
   GripIcon
 } from '../../../../shared/icons/index.jsx';
 import { useSortableItem } from '../../../../shared/components/DragDropList/index.js';
-import IconPasteButton from './IconPasteButton.jsx';
+import IconPickerButton from './IconPickerButton.jsx';
 
 function SubmoduleRow({ sub, parentId, readOnly, onRemove, onIconChange }) {
   const { setNodeRef, attributes, listeners, style, isOver, active } =
@@ -58,7 +58,7 @@ function SubmoduleRow({ sub, parentId, readOnly, onRemove, onIconChange }) {
           </span>
         )}
 
-        <IconPasteButton
+        <IconPickerButton
           size={14}
           iconSvg={sub.iconSvg}
           onChange={readOnly ? undefined : onIconChange}
@@ -158,7 +158,7 @@ export default function EditableModuleRow({
           </span>
         )}
 
-        <IconPasteButton
+        <IconPickerButton
           size={17}
           iconSvg={module.iconSvg}
           onChange={readOnly ? undefined : onIconChange}

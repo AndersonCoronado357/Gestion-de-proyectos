@@ -802,46 +802,8 @@ function DragDropZonesPreview() {
   );
 }
 
-// Iconos: SIEMPRE desde la base de datos (tabla `icons`), no hardcodeados.
-function IconsPreview() {
-  const [icons, setIcons] = useState<
-    { id: number; name: string | null; svg: string }[]
-  >([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    http<{ icons: { id: number; name: string | null; svg: string }[] }>(
-      '/navigation/icons'
-    )
-      .then((d) => setIcons(d?.icons ?? []))
-      .catch(() => setIcons([]))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading)
-    return <p className="text-[12px] text-fg-faint">Cargando iconos…</p>;
-  if (icons.length === 0)
-    return (
-      <p className="text-[12px] text-fg-faint">
-        No hay iconos en la base de datos.
-      </p>
-    );
-  return (
-    <div className="flex flex-wrap gap-2 text-fg-subtle">
-      {icons.map((ic) => (
-        <span
-          key={ic.id}
-          title={ic.name ?? ''}
-          className="flex h-9 w-9 items-center justify-center rounded-md ring-1 ring-border-subtle"
-        >
-          <span
-            className="block h-[18px] w-[18px] [&>svg]:h-full [&>svg]:w-full"
-            dangerouslySetInnerHTML={{ __html: ic.svg }}
-          />
-        </span>
-      ))}
-    </div>
-  );
-}
+// La galería de iconos de la BD vive ahora en Administración → Iconos.
+// El catálogo de Componentes sólo muestra primitivas de UI.
 
 const CATALOG = [
   {
@@ -905,12 +867,7 @@ const CATALOG = [
   { id: 'drag-drop', name: 'DragDrop · reordenar', preview: () => <DragDropReorderPreview /> },
   { id: 'drag-drop-zones', name: 'DragDrop · entre zonas (canvas)', preview: () => <DragDropZonesPreview /> },
   { id: 'alerts', name: 'Alert (modales)', preview: () => <AlertPreview /> },
-  { id: 'toasts', name: 'Toast (notificaciones)', preview: () => <ToastPreview /> },
-  {
-    id: 'icons',
-    name: 'Iconos (biblioteca BD)',
-    preview: () => <IconsPreview />
-  }
+  { id: 'toasts', name: 'Toast (notificaciones)', preview: () => <ToastPreview /> }
 ];
 
 // ── Auto-discovery por convención ──────────────────────────────────────
