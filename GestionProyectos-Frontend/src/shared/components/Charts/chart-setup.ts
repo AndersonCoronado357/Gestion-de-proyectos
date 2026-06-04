@@ -311,18 +311,27 @@ export function useChartColors(): ChartColors {
     return () => obs.disconnect();
   }, []);
 
-  return useMemo<ChartColors>(
-    () => ({
-      palette: [600, 400, 500, 300, 700, 200].map((s) =>
-        rgbToken(`--color-primary-${s}`)
-      ),
+  return useMemo<ChartColors>(() => {
+    // En CLARO la paleta clásica del brand (4 shades medianas + 700 + 200)
+    // funciona porque las medianas (300/400/500/600) tienen suficiente
+    // contraste con un fondo blanco. En OSCURO sobre fondo oscuro esos
+    // mismos shades se pegan visualmente — necesitamos alternar shades muy
+    // CLARAS (700/800) y muy OSCURAS (100/200) además del brand 600.
+    // Detectamos `data-theme="dark"` en <html>.
+    const isDark =
+      typeof document !== 'undefined' &&
+      document.documentElement.getAttribute('data-theme') === 'dark';
+    const order = isDark
+      ? [600, 800, 200, 700, 100, 300] // alternar claro/oscuro contra fondo oscuro
+      : [600, 400, 500, 300, 700, 200]; // paleta original — claro
+    return {
+      palette: order.map((s) => rgbToken(`--color-primary-${s}`)),
       text: rgbToken('--color-fg'),
       muted: rgbToken('--color-fg-muted'),
       faint: rgbToken('--color-fg-faint'),
       grid: rgbToken('--color-border-subtle'),
       surface: rgbToken('--color-bg-muted'),
       bg: rgbToken('--color-bg')
-    }),
-    [tick]
-  );
+    };
+  }, [tick]);
 }

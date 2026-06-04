@@ -276,7 +276,10 @@ export default function Select<V extends string | number = string>({
             }
           }}
           className={cn(
-            'flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-fg-faint transition-all duration-150',
+            // -ml-1.5 acerca la X al borde izquierdo (queda a ~6px del borde
+            // en vez de pegada al label). Conserva una pequeña separación
+            // del filo: no toca el borde del select.
+            '-ml-1.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-fg-faint transition-all duration-150',
             selected
               ? 'cursor-pointer opacity-100 hover:bg-bg hover:text-fg-muted active:scale-90'
               : 'pointer-events-none opacity-0'

@@ -14,7 +14,11 @@ export type BadgeSize = 'sm' | 'md';
 
 const VARIANTS: Record<BadgeVariant, string> = {
   neutral: 'bg-bg-muted text-fg-muted',
-  primary: 'bg-primary-50 text-primary dark:bg-primary-500/15',
+  // En oscuro: primary-700/35 sobre fondo oscuro pinta un azul claro
+  // claramente distinguible (antes 500/15 quedaba casi invisible), y el
+  // texto va con primary-800 (shade claro en oscuro) para mantener contraste.
+  primary:
+    'bg-primary-50 text-primary dark:bg-primary-700/35 dark:text-primary-800',
   success: 'bg-success-surface text-success-text',
   warning: 'bg-warning-surface text-warning-text',
   danger: 'bg-danger-surface text-danger-text'

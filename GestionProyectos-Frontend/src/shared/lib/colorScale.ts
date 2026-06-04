@@ -41,6 +41,50 @@ function mix(c1: Rgb, c2: Rgb, t: number): Rgb {
   };
 }
 
+// HSL ↔ RGB para poder fijar luminosidades target perceptualmente uniformes
+// (lo que RGB-mix no logra cuando el color base ya es oscuro).
+interface Hsl {
+  h: number; // 0..360
+  s: number; // 0..1
+  l: number; // 0..1
+}
+function rgbToHsl({ r, g, b }: Rgb): Hsl {
+  const R = r / 255,
+    G = g / 255,
+    B = b / 255;
+  const max = Math.max(R, G, B),
+    min = Math.min(R, G, B);
+  const l = (max + min) / 2;
+  if (max === min) return { h: 0, s: 0, l };
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h = 0;
+  if (max === R) h = ((G - B) / d + (G < B ? 6 : 0)) * 60;
+  else if (max === G) h = ((B - R) / d + 2) * 60;
+  else h = ((R - G) / d + 4) * 60;
+  return { h, s, l };
+}
+function hueToRgb(p: number, q: number, t: number): number {
+  let x = t;
+  if (x < 0) x += 1;
+  if (x > 1) x -= 1;
+  if (x < 1 / 6) return p + (q - p) * 6 * x;
+  if (x < 1 / 2) return q;
+  if (x < 2 / 3) return p + (q - p) * (2 / 3 - x) * 6;
+  return p;
+}
+function hslToRgb({ h, s, l }: Hsl): Rgb {
+  if (s === 0) return { r: l * 255, g: l * 255, b: l * 255 };
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const H = h / 360;
+  return {
+    r: hueToRgb(p, q, H + 1 / 3) * 255,
+    g: hueToRgb(p, q, H) * 255,
+    b: hueToRgb(p, q, H - 1 / 3) * 255
+  };
+}
+
 const WHITE: Rgb = { r: 255, g: 255, b: 255 };
 const BLACK: Rgb = { r: 0, g: 0, b: 0 };
 
@@ -83,26 +127,70 @@ export function generateScaleFromHex(hex: string): ColorScale {
   return buildScale(hex, SHADE_MIXES);
 }
 
-// Híbrido: los tonos "claros" (50-200) se vuelven oscuros con tinte del color
-// para que selecciones/badges sigan visibles sobre fondo oscuro. Los tonos
-// "base" (500-600) se mantienen igual para que botones y elementos primary
-// no cambien al alternar de modo. Los tonos "oscuros" (700-900) se aclaran
-// para usarse como texto/iconos sobre fondos oscuros.
-const DARK_SHADE_MIXES: Record<ScaleKey, MixSpec | null> = {
-  50: { with: 'black', t: 0.78 },
-  100: { with: 'black', t: 0.62 },
-  200: { with: 'black', t: 0.42 },
-  300: { with: 'black', t: 0.24 },
-  400: { with: 'black', t: 0.1 },
-  500: null, // base
-  600: null, // base — mantiene el color del botón intacto
-  700: { with: 'white', t: 0.32 },
-  800: { with: 'white', t: 0.55 },
-  900: { with: 'white', t: 0.78 }
+// Escala en modo oscuro derivada por LUMINOSIDAD HSL (no por mezcla RGB).
+//
+// Con un brand oscuro como #295072, mezclar canales RGB con negro deja todas
+// las shades bajas pegadas (rango RGB minúsculo) y las gráficas no logran
+// diferenciar segmentos. Trabajando en HSL podemos fijar saltos de
+// luminosidad PERCEPTUALMENTE UNIFORMES.
+//
+// Las shades 50-500 se distribuyen entre 0 y la luminosidad del brand
+// (relativo, así funciona para cualquier hex). Las 700-900 entre el brand
+// y 1. El brand 600 queda intacto (mismo hex que en modo claro) para que
+// botones primary y demás no cambien al alternar de tema.
+//
+// Factor relativo al base. ej: 50 = baseL * 0.15.
+const DARK_L_FACTOR_BELOW: Record<ScaleKey, number | null> = {
+  50: 0.15,
+  100: 0.3,
+  200: 0.5,
+  300: 0.65,
+  400: 0.8,
+  500: 0.92,
+  600: null,
+  700: null,
+  800: null,
+  900: null
+};
+// Factor relativo al rango (1 - baseL). ej: 700 = baseL + (1-baseL) * 0.35.
+const DARK_L_FACTOR_ABOVE: Record<ScaleKey, number | null> = {
+  50: null,
+  100: null,
+  200: null,
+  300: null,
+  400: null,
+  500: null,
+  600: null,
+  700: 0.4,
+  800: 0.52, // antes 0.68 → quedaba casi blanco
+  900: 0.78 // antes 0.88 → bajado para no luxar demasiado
 };
 
 export function generateDarkScaleFromHex(hex: string): ColorScale {
-  return buildScale(hex, DARK_SHADE_MIXES);
+  const baseRgb = hexToRgb(hex);
+  const baseHsl = rgbToHsl(baseRgb);
+  const baseL = baseHsl.l;
+  const out = {} as ColorScale;
+  for (const key of SCALE_KEYS) {
+    const below = DARK_L_FACTOR_BELOW[key];
+    const above = DARK_L_FACTOR_ABOVE[key];
+    let l: number;
+    if (below != null) {
+      l = baseL * below;
+    } else if (above != null) {
+      l = baseL + (1 - baseL) * above;
+    } else {
+      out[key] = rgbToHex(baseRgb); // 600 — brand intacto
+      continue;
+    }
+    // Saturación: la bajamos un poco en extremos para que las shades muy
+    // claras (l ≈ 0.9) no se laven a un color muy desaturado y las muy
+    // oscuras (l ≈ 0.04) no parezcan ruido neutro.
+    const distFromMid = Math.abs(l - 0.5);
+    const satScale = 1 - distFromMid * 0.5;
+    out[key] = rgbToHex(hslToRgb({ h: baseHsl.h, s: baseHsl.s * satScale, l }));
+  }
+  return out;
 }
 
 export function isValidHex(value: string | null | undefined): boolean {
