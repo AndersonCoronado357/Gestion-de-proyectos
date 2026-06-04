@@ -98,7 +98,7 @@ function SearchPreview() {
 }
 
 function SelectPreview() {
-  const [a, setA] = useState<string>('opt1');
+  const [a, setA] = useState<string | null>('opt1');
   const [b, setB] = useState<string | null>(null);
   return (
     <div className="flex w-full max-w-[520px] flex-wrap gap-6">
@@ -111,6 +111,7 @@ function SelectPreview() {
           }))}
           value={a}
           onChange={setA}
+          placeholder="Seleccionar"
         />
       </div>
       <div className="w-[220px]">
@@ -912,6 +913,49 @@ const CATALOG = [
   }
 ];
 
-export function useComponentsCatalog() {
-  return CATALOG;
+// ── Auto-discovery por convención ──────────────────────────────────────
+// Cada componente en `shared/components/<X>/` puede exportar un archivo
+// `<X>.preview.tsx` con:
+//   - `export default function`: el componente de demo
+//   - `export const meta = { id, name }`
+// Vite recolecta TODOS esos archivos automáticamente (eager) → así no hay
+// que tocar este hook al agregar componentes nuevos: con crear el preview
+// alcanza para que aparezcan en el módulo de Componentes.
+
+interface PreviewModule {
+  default: () => React.ReactElement | null;
+  meta: { id: string; name: string };
+}
+
+const PREVIEW_MODULES = import.meta.glob<PreviewModule>(
+  '../../../../shared/components/*/*.preview.tsx',
+  { eager: true }
+);
+
+interface CatalogEntry {
+  id: string;
+  name: string;
+  preview: () => React.ReactElement | null;
+}
+
+const AUTO_ENTRIES: CatalogEntry[] = Object.values(PREVIEW_MODULES)
+  .filter((m) => m && m.meta && typeof m.default === 'function')
+  .map((m) => ({
+    id: m.meta.id,
+    name: m.meta.name,
+    preview: m.default
+  }));
+
+export function useComponentsCatalog(): CatalogEntry[] {
+  // Mantener orden: manual primero, luego auto-descubiertos que no estén
+  // ya catalogados manualmente (dedupe por id).
+  const seen = new Set(CATALOG.map((e) => e.id));
+  const merged: CatalogEntry[] = [...CATALOG];
+  for (const e of AUTO_ENTRIES) {
+    if (!seen.has(e.id)) {
+      merged.push(e);
+      seen.add(e.id);
+    }
+  }
+  return merged;
 }
