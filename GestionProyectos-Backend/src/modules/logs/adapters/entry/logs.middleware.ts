@@ -22,8 +22,25 @@ function shortId(): string {
   return crypto.randomBytes(8).toString('hex');
 }
 
-// Evitamos crear ruido: no logueamos el propio endpoint de ingesta ni health.
-const SKIP_PATHS = new Set<string>(['/api/logs', '/health']);
+// Evitamos crear ruido: no logueamos el endpoint de ingesta, health, ni el
+// tráfico "de fondo" de la app (heartbeat de inactividad, SSE, refresh de
+// tokens, lectura de la sesión, catálogo de iconos del navbar). De lo
+// contrario, una pestaña abierta puede generar cientos de filas por hora
+// sin valor diagnóstico.
+const SKIP_PREFIXES: readonly string[] = [
+  '/api/logs',
+  '/api/me/activity',
+  '/api/events',
+  '/api/auth/refresh',
+  '/api/auth/me',
+  '/api/navigation/icons'
+];
+const SKIP_PATHS = new Set<string>(['/health']);
+function isSkipped(p: string): boolean {
+  if (SKIP_PATHS.has(p)) return true;
+  for (const pref of SKIP_PREFIXES) if (p.startsWith(pref)) return true;
+  return false;
+}
 
 export function buildLogsMiddleware(logRepository: LogRepositoryPort) {
   return function logsMiddleware(req: Request, res: Response, next: NextFunction): void {
@@ -31,7 +48,7 @@ export function buildLogsMiddleware(logRepository: LogRepositoryPort) {
     req.requestId = id;
     res.setHeader('x-request-id', id);
 
-    if (SKIP_PATHS.has(req.path) || req.path.startsWith('/api/logs')) {
+    if (isSkipped(req.path)) {
       next();
       return;
     }

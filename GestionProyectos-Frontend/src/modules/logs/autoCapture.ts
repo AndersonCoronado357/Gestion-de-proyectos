@@ -108,8 +108,19 @@ export function installAutoCapture(): void {
     const method = (init?.method ?? (input instanceof Request ? input.method : 'GET') ?? 'GET')
       .toUpperCase();
 
-    // Evitar bucle: no registramos el propio endpoint de logs.
-    if (url.includes('/api/logs')) {
+    // Evitar bucle y ruido: no registramos el propio endpoint de logs ni el
+    // tráfico "de fondo" (heartbeat de inactividad, SSE, refresh, sesión,
+    // catálogo de íconos). Una sola pestaña abierta puede generar cientos
+    // de filas por hora sin valor diagnóstico.
+    const NOISE = [
+      '/api/logs',
+      '/api/me/activity',
+      '/api/events',
+      '/api/auth/refresh',
+      '/api/auth/me',
+      '/api/navigation/icons'
+    ];
+    if (NOISE.some((p) => url.includes(p))) {
       return originalFetch(input, init);
     }
 

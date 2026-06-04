@@ -12,7 +12,12 @@ const baseConfig = {
     options: {
       encrypt: env.db.encrypt,
       trustServerCertificate: env.db.trustServerCertificate,
-      enableArithAbort: true
+      enableArithAbort: true,
+      // Tedious default = 15 s. SQL Server local (Express, Developer) puede
+      // pasarse fácil con auto-update stats o I/O contention en queries
+      // amplias (joins con icons, listados de app_logs). 30 s da margen.
+      requestTimeout: 30000,
+      connectTimeout: 30000
     }
   },
   pool: { min: 2, max: 10 },
