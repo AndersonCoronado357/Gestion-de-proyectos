@@ -11,11 +11,14 @@ export interface TextareaProps
   label?: ReactNode;
   hint?: ReactNode;
   error?: ReactNode;
+  /** Clases para el `<div>` envoltorio (útil para `flex-1 min-h-0` en
+   *  layouts donde el textarea debe ocupar el alto sobrante). */
+  wrapperClassName?: string;
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   function Textarea(
-    { label, hint, error, rows = 4, className, id, ...props },
+    { label, hint, error, rows = 4, className, wrapperClassName, id, ...props },
     ref
   ) {
     const reactId = useId();
@@ -23,7 +26,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const hasError = !!error;
 
     return (
-      <div className="w-full">
+      <div className={cn('w-full', wrapperClassName)}>
         {label ? (
           <label
             htmlFor={tId}
@@ -39,7 +42,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           rows={rows}
           aria-invalid={hasError || undefined}
           className={cn(
-            'w-full resize-y rounded-md bg-bg-muted px-3 py-2 text-[12.5px] text-fg placeholder:text-fg-faint',
+            // Sin resize manual por defecto (sin el "agarrador" en la esquina).
+            // Si el caller lo quiere, puede pasar `resize-y` en className.
+            'w-full resize-none rounded-md bg-bg-muted px-3 py-2 text-[12.5px] text-fg placeholder:text-fg-faint',
             'border-0 outline-none transition-colors',
             className
           )}
