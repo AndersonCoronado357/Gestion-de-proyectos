@@ -46,14 +46,6 @@ const CATEGORY_OPTS: ReadonlyArray<{ value: LogCategory; label: string }> = [
   { value: 'console', label: 'Consola' }
 ];
 
-type AutoOption = '5' | '15' | '30' | '60';
-const AUTO_OPTS: ReadonlyArray<{ value: AutoOption; label: string }> = [
-  { value: '5', label: 'Auto · 5 s' },
-  { value: '15', label: 'Auto · 15 s' },
-  { value: '30', label: 'Auto · 30 s' },
-  { value: '60', label: 'Auto · 60 s' }
-];
-
 interface Row extends RemoteLogEntry {
   _id: number;
 }
@@ -266,10 +258,6 @@ export default function LogsPage() {
   const currentLevel: LogLevel | null = b.filters.levels[0] ?? null;
   const currentSource: LogSource | null = b.filters.sources[0] ?? null;
   const currentCategory: LogCategory | null = b.filters.categories[0] ?? null;
-  const currentAuto: AutoOption | null =
-    b.filters.autoRefreshSec > 0
-      ? (String(b.filters.autoRefreshSec) as AutoOption)
-      : null;
 
   return (
     <div className="flex h-full gap-4 overflow-hidden p-3 sm:p-4 lg:p-8">
@@ -354,15 +342,6 @@ export default function LogsPage() {
                 b.setFilter('categories', v ? [v] : []),
               placeholder: 'Todas las categorías',
               width: 180
-            },
-            {
-              id: 'auto-refresh',
-              options: AUTO_OPTS,
-              value: currentAuto,
-              onChange: (v: AutoOption | null) =>
-                b.setFilter('autoRefreshSec', v ? Number(v) : 0),
-              placeholder: 'Sin auto-refresh',
-              width: 150
             }
           ]}
         />
@@ -376,7 +355,7 @@ export default function LogsPage() {
             onRowClick={
               b.loading ? undefined : (_k, r) => void b.selectLog(r)
             }
-            initialPageSize={10}
+            initialPageSize={100}
             hideLocalSearch
             emptyMessage={
               b.error ? 'No se pudo cargar la bitácora' : 'No hay eventos registrados'

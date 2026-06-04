@@ -24,8 +24,6 @@ export interface LogsFiltersState {
   search: string;
   page: number;
   pageSize: number;
-  /** Auto-refresco en segundos (0 = manual). */
-  autoRefreshSec: number;
 }
 
 const INITIAL_FILTERS: LogsFiltersState = {
@@ -34,8 +32,7 @@ const INITIAL_FILTERS: LogsFiltersState = {
   categories: [],
   search: '',
   page: 1,
-  pageSize: 50,
-  autoRefreshSec: 0
+  pageSize: 100
 };
 
 export function useLogsBuilder() {
@@ -88,14 +85,6 @@ export function useLogsBuilder() {
   useEffect(() => {
     void refresh();
   }, [refresh]);
-
-  // Auto-refresh.
-  useEffect(() => {
-    if (filters.autoRefreshSec <= 0) return;
-    const ms = filters.autoRefreshSec * 1000;
-    const id = setInterval(() => void refresh(true), ms);
-    return () => clearInterval(id);
-  }, [filters.autoRefreshSec, refresh]);
 
   const selectLog = useCallback(async (entry: RemoteLogEntry | null) => {
     if (!entry || !entry.id) {
