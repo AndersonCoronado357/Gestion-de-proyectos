@@ -26,6 +26,10 @@ export interface LineChartProps {
   /** Click sobre la línea/área → callback con el índice de la serie. */
   onSelect?: (datasetIndex: number) => void;
   className?: string;
+  /** Oculta ejes y padding interno para que el dibujo del chart ocupe
+   *  el 100% del contenedor — útil cuando se renderea como decoración
+   *  o dentro de un frame que ya tiene su propio padding. */
+  noPadding?: boolean;
 }
 
 export default function LineChart({
@@ -36,7 +40,8 @@ export default function LineChart({
   showPoints = true,
   height = 300,
   onSelect,
-  className
+  className,
+  noPadding = false
 }: LineChartProps) {
   const cc = useChartColors();
   // `sel` = DATASET (serie) elegido al hacer click. Cuando hay selección solo se
@@ -117,7 +122,7 @@ export default function LineChart({
     responsive: true,
     maintainAspectRatio: false,
     interaction: { mode: 'belowLine', intersect: false },
-    layout: { padding: { top: 10 } },
+    layout: { padding: noPadding ? 0 : { top: 10 } },
     // Anima color (fade) Y números (radio del punto) → seleccionar/deseleccionar
     // una serie es un fundido suave, no un corte instantáneo.
     animation: { duration: 400, easing: 'easeOutQuart' },
@@ -131,7 +136,7 @@ export default function LineChart({
     },
     plugins: {
       legend: {
-        display: showLegend,
+        display: noPadding ? false : showLegend,
         position: 'bottom',
         align: 'start',
         // Click en la leyenda → mismo "pick" que el click en la línea: muestra
@@ -153,11 +158,13 @@ export default function LineChart({
     },
     scales: {
       x: {
+        display: !noPadding,
         border: { display: false },
         grid: { display: false },
         ticks: { color: cc.muted, font: { size: 11 }, padding: 6 }
       },
       y: {
+        display: !noPadding,
         border: { display: false },
         grid: { display: false },
         ticks: { color: cc.muted, font: { size: 11 }, padding: 8 },

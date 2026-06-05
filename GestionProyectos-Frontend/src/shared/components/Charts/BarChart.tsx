@@ -53,6 +53,9 @@ export interface BarChartProps {
   onSelect?: (index: number) => void;
   selectedIndex?: number | null;
   className?: string;
+  /** Oculta ejes y padding interno para que las barras ocupen el 100%
+   *  del contenedor. */
+  noPadding?: boolean;
 }
 
 export default function BarChart({
@@ -61,7 +64,8 @@ export default function BarChart({
   height = 300,
   onSelect,
   selectedIndex,
-  className
+  className,
+  noPadding = false
 }: BarChartProps) {
   const cc = useChartColors();
   const [picked, setPicked] = useState<number | null>(null);
@@ -98,11 +102,12 @@ export default function BarChart({
     responsive: true,
     maintainAspectRatio: false,
     interaction: { mode: 'nearest', intersect: true },
-    layout: { padding: { top: 18, right: horizontal ? 38 : 8 } },
+    layout: { padding: noPadding ? 0 : { top: 18, right: horizontal ? 38 : 8 } },
     onClick: clickHandler(pick),
     plugins: { legend: { display: false }, tooltip: tooltipPlugin() },
     scales: {
       x: {
+        display: !noPadding,
         border: { display: false },
         grid: { display: false },
         ticks: { color: cc.muted, font: { size: 11 } },
@@ -110,6 +115,7 @@ export default function BarChart({
         max: horizontal ? vMax : undefined
       },
       y: {
+        display: !noPadding,
         border: { display: false },
         grid: { display: false },
         ticks: { color: cc.muted, font: { size: 11 } },
