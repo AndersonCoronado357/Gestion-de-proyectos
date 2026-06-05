@@ -2,6 +2,7 @@ import type { SVGProps } from 'react';
 import SearchInput from '../SearchInput/index.js';
 import UserMenu from '../UserMenu/index.js';
 import { useSearch } from '../../search/SearchContext.js';
+import { useHeaderSlots } from './HeaderSlotContext.js';
 
 function MenuIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -44,6 +45,7 @@ export default function Header({
   // (DataTable, sidebar, paletas) lo lee para filtrar su data.  El
   // contexto se resetea solo cuando cambia la ruta.
   const { query, setQuery } = useSearch();
+  const slots = useHeaderSlots();
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 bg-bg px-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] md:gap-4 md:px-6">
@@ -56,9 +58,17 @@ export default function Header({
         <MenuIcon />
       </button>
 
+      {slots.leading && (
+        <div className="flex shrink-0 items-center">{slots.leading}</div>
+      )}
+
       <h1 className="flex-1 truncate text-center text-[16px] font-bold tracking-tight text-primary-700 md:text-[18px]">
-        {title ?? 'gestionproyectos'}
+        {title ?? 'Gestión de Proyectos'}
       </h1>
+
+      {slots.trailing && (
+        <div className="flex shrink-0 items-center">{slots.trailing}</div>
+      )}
 
       <SearchInput
         className="hidden md:block md:w-72"

@@ -8,6 +8,7 @@ import { IconsProvider } from './shared/icons/index.js';
 import { AuthProvider } from './modules/auth/ui/AuthContext.js';
 import { NavigationProvider } from './modules/navigation/NavigationContext.js';
 import { SearchProvider } from './shared/search/SearchContext.js';
+import { HeaderSlotProvider } from './shared/components/Header/HeaderSlotContext.js';
 import { PreferencesSync } from './modules/preferences/PreferencesSync.js';
 import { installAutoCapture } from './modules/logs/autoCapture.js';
 import './index.css';
@@ -42,12 +43,14 @@ root.render(
           }}
         >
           <SearchProvider>
-            <AuthProvider>
-              <PreferencesSync />
-              <NavigationProvider>
-                <App />
-              </NavigationProvider>
-            </AuthProvider>
+            <HeaderSlotProvider>
+              <AuthProvider>
+                <PreferencesSync />
+                <NavigationProvider>
+                  <App />
+                </NavigationProvider>
+              </AuthProvider>
+            </HeaderSlotProvider>
           </SearchProvider>
         </BrowserRouter>
       </ToastProvider>
