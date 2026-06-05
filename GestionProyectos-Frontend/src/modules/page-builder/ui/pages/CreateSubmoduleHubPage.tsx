@@ -1,13 +1,13 @@
-// CreateSubmoduleHubPage — pantalla inicial al crear un submódulo.
-//
-// 2 contenedores (cards) con padding alrededor.  El nombre del
-// submódulo se escribe directamente en el "título" del card derecho
-// (input estilo título, autoFocus, sin label aparte).
+// Hub de UN submódulo: carga el design_project por :id y muestra a la
+// izquierda el árbol de carpetas que tendría (ProjectStructureTree), al
+// centro el nombre del submódulo + las 5 opciones (Front / BD / APIs /
+// Lógica / Permisos). Click en "Front" → editor visual a pantalla
+// completa.
 
 import { useEffect, useState, type ComponentType } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '../../../../shared/lib/cn.js';
-import Button from '../../../../shared/components/Button/index.js';
+import Skeleton from '../../../../shared/components/Skeleton/index.js';
 import {
   DatabaseIcon,
   LayoutIcon,
@@ -15,18 +15,21 @@ import {
   ApiIcon,
   KeyIcon,
   ChevronRightIcon,
-  PlusIcon
+  ChevronLeftIcon
 } from '../../../../shared/icons/index.js';
 import ProjectStructureTree from '../components/ProjectStructureTree.js';
-import { http } from '../../../../shared/utils/http.js';
 import { useToast } from '../../../../shared/components/Toast/index.js';
+import {
+  getProject,
+  renameProject,
+  type DesignProjectWithViews
+} from '../../../design/api.js';
 
 interface Section {
-  id: 'db' | 'front' | 'logic' | 'apis' | 'perms';
+  id: 'front' | 'db' | 'apis' | 'logic' | 'perms';
   title: string;
   description: string;
   Icon: ComponentType<{ width?: number; height?: number; strokeWidth?: number }>;
-  route?: string;
 }
 
 const SECTIONS: ReadonlyArray<Section> = [
@@ -42,12 +45,7 @@ const SECTIONS: ReadonlyArray<Section> = [
     description: 'Tablas, columnas y relaciones del submódulo.',
     Icon: DatabaseIcon
   },
-  {
-    id: 'apis',
-    title: 'APIs',
-    description: 'APIs consumidas.',
-    Icon: ApiIcon
-  },
+  { id: 'apis', title: 'APIs', description: 'APIs consumidas.', Icon: ApiIcon },
   {
     id: 'logic',
     title: 'Lógica',
@@ -62,86 +60,153 @@ const SECTIONS: ReadonlyArray<Section> = [
   }
 ];
 
-const PENDING_TOAST_KEY = 'gp:builder-created';
-
 export default function CreateSubmoduleHubPage() {
   const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [creating, setCreating] = useState(false);
   const toast = useToast();
+  const { id } = useParams<{ id: string }>();
+  const projectId = id ? Number(id) : null;
 
-  // Crea el submódulo: el backend (solo dev) genera su estructura de archivos.
-  // OJO: al crear la carpeta en src/modules, Vite hace full-reload (se lleva el
-  // toast). Por eso lo dejamos pendiente y lo mostramos al re-montar (efecto).
-  const handleCreate = async () => {
+  const [project, setProject] = useState<DesignProjectWithViews | null>(null);
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Carga el proyecto al entrar / cambiar de id.
+  useEffect(() => {
+    if (!projectId) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    void (async () => {
+      try {
+        const p = await getProject(projectId);
+        if (cancelled) return;
+        if (!p) {
+          setError('Submódulo no encontrado');
+          return;
+        }
+        setProject(p);
+        setName(p.name);
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Error');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
+
+  // Persiste renombre al salir del input (blur o Enter).
+  const commitRename = async (): Promise<void> => {
+    if (!project) return;
     const n = name.trim();
-    if (!n || creating) return;
-    setCreating(true);
+    if (!n || n === project.name) {
+      setName(project.name);
+      return;
+    }
     try {
-      await http('/builder/submodule', { method: 'POST', body: { name: n } });
-      sessionStorage.setItem(
-        PENDING_TOAST_KEY,
-        JSON.stringify({ name: n, at: Date.now() })
-      );
-      setName('');
+      const updated = await renameProject(project.id, n);
+      if (updated) setProject({ ...project, name: updated.name });
     } catch (e) {
       toast.error({
-        title: 'No se pudo crear el submódulo',
+        title: 'No se pudo renombrar',
         message: e instanceof Error ? e.message : 'Inténtalo de nuevo.'
       });
-    } finally {
-      setCreating(false);
+      setName(project.name);
     }
   };
 
-  // Tras el full-reload de Vite, mostramos el toast que quedó pendiente.
-  useEffect(() => {
-    const raw = sessionStorage.getItem(PENDING_TOAST_KEY);
-    if (!raw) return;
-    sessionStorage.removeItem(PENDING_TOAST_KEY);
-    try {
-      const { name: created, at } = JSON.parse(raw) as { name: string; at: number };
-      if (created && Date.now() - at < 15000) {
-        toast.success({
-          title: 'Submódulo creado',
-          message: `"${created}" ya está en el proyecto.`
-        });
-      }
-    } catch {
-      /* ignore */
+  const openSection = (sectionId: Section['id']): void => {
+    if (!project) return;
+    if (sectionId === 'front') {
+      navigate(`/administracion/diseno/${project.id}`);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // Las otras secciones todavía no tienen pantalla destino.
+  };
+
+  if (!projectId) {
+    return (
+      <div className="flex h-full items-center justify-center text-fg-faint">
+        Falta el submódulo. Volvé al{' '}
+        <button
+          type="button"
+          onClick={() => navigate('/administracion/modulos/editor')}
+          className="ml-1 underline outline-none hover:text-fg"
+        >
+          editor
+        </button>
+        .
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-full gap-4 p-3 sm:p-4 lg:p-6">
+        <Skeleton variant="rect" width={300} height="100%" />
+        <Skeleton variant="rect" width="100%" height="100%" className="flex-1" />
+      </div>
+    );
+  }
+
+  if (error || !project) {
+    return (
+      <div className="flex h-full items-center justify-center text-danger-text">
+        {error ?? 'Error cargando el submódulo'}
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto bg-page p-4 lg:flex-row lg:overflow-hidden lg:p-6">
-      {/* ── Card 1: estructura del proyecto (con Volver arriba) ── */}
+      {/* ── Card 1: estructura del proyecto (con botón Volver arriba) ── */}
       <aside className="order-last flex w-full shrink-0 flex-col overflow-hidden rounded-xl bg-bg shadow-sm lg:order-none lg:h-full lg:w-[300px]">
-        <ProjectStructureTree name={name} onBack={() => navigate(-1)} />
+        <ProjectStructureTree
+          name={name}
+          onBack={() => navigate('/administracion/modulos/editor')}
+        />
       </aside>
 
-      {/* ── Card 2: header (input-título) + 3 opciones ── */}
+      {/* ── Card 2: header (input-título) + opciones ── */}
       <main className="flex w-full flex-col rounded-xl bg-bg shadow-sm lg:min-h-0 lg:flex-1 lg:overflow-hidden">
-        {/* Header: input título (el nombre del submódulo), centrado. */}
-        <div className="flex shrink-0 items-center justify-center border-b border-border-subtle px-5 py-3">
+        <div className="flex shrink-0 items-center gap-2 border-b border-border-subtle px-5 py-3">
+          <button
+            type="button"
+            onClick={() => navigate('/administracion/modulos/editor')}
+            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-fg-muted outline-none transition-colors hover:bg-bg-muted hover:text-fg lg:hidden"
+            title="Volver"
+          >
+            <ChevronLeftIcon width={14} height={14} />
+          </button>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nombre del nuevo submódulo"
-            autoFocus
+            onBlur={() => void commitRename()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+              if (e.key === 'Escape') {
+                setName(project.name);
+                (e.target as HTMLInputElement).blur();
+              }
+            }}
+            placeholder="Nombre del submódulo"
             autoComplete="off"
             className="min-w-0 flex-1 bg-transparent text-center text-[13px] font-semibold tracking-tight text-fg outline-none placeholder:font-normal placeholder:text-fg-faint"
           />
         </div>
 
-        {/* 5 opciones apiladas, ocupando todo el alto disponible. */}
         <div className="flex flex-col gap-3 p-4 sm:p-5 lg:grid lg:min-h-0 lg:flex-1 lg:grid-rows-5">
-          {SECTIONS.map(({ id, title, description, Icon, route }) => (
+          {SECTIONS.map(({ id: sid, title, description, Icon }) => (
             <button
-              key={id}
+              key={sid}
               type="button"
-              onClick={() => route && navigate(route)}
+              onClick={() => openSection(sid)}
               className={cn(
                 'group flex w-full items-center gap-5 rounded-xl bg-primary-50 px-5 py-4 text-left outline-none transition-colors duration-150',
                 'hover:bg-primary-100/70 dark:bg-primary-500/10 dark:hover:bg-primary-500/20'
@@ -154,9 +219,7 @@ export default function CreateSubmoduleHubPage() {
                 <h3 className="text-[14px] font-semibold tracking-tight text-fg">
                   {title}
                 </h3>
-                <p className="mt-1 text-[12px] text-fg-muted">
-                  {description}
-                </p>
+                <p className="mt-1 text-[12px] text-fg-muted">{description}</p>
               </div>
               <ChevronRightIcon
                 width={16}
@@ -165,19 +228,6 @@ export default function CreateSubmoduleHubPage() {
               />
             </button>
           ))}
-        </div>
-
-        {/* Footer con botón de crear. */}
-        <div className="flex shrink-0 items-center justify-end border-t border-border-subtle px-5 py-3">
-          <Button
-            variant="primary"
-            size="sm"
-            leftIcon={<PlusIcon width={13} height={13} strokeWidth={2.5} />}
-            disabled={!name.trim() || creating}
-            onClick={handleCreate}
-          >
-            {creating ? 'Creando submódulo…' : 'Crear submódulo'}
-          </Button>
         </div>
       </main>
     </div>

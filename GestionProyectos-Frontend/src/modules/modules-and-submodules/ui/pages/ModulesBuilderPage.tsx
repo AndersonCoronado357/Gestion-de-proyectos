@@ -300,9 +300,9 @@ export default function ModulesBuilderPage() {
                   size="sm"
                   variant="primary"
                   leftIcon={<PlusIcon width={14} height={14} strokeWidth={2.75} />}
-                  onClick={() => navigate('/administracion/modulos/crear-submodulo')}
+                  onClick={() => navigate('/administracion/modulos/editor')}
                 >
-                  Crear submódulo
+                  Editor de submódulos
                 </Button>
               ) : null
             }
