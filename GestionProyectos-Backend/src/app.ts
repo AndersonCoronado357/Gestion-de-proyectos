@@ -21,6 +21,7 @@ const buildBuilderRoutes = require('./modules/page-builder/builder.routes');
 const buildTestRunnerRoutes = require('./modules/test-runner/test-runner.routes');
 const buildLogsRoutes = require('./modules/logs/adapters/entry/logs.routes');
 const buildIconsRoutes = require('./modules/icons/adapters/entry/icons.routes');
+const buildDesignRoutes = require('./modules/design/adapters/entry/design.routes');
 const LogRepositoryImpl = require('./modules/logs/adapters/exit/log.repository.impl');
 const { buildLogsMiddleware } = require('./modules/logs/adapters/entry/logs.middleware');
 
@@ -59,6 +60,7 @@ module.exports = function buildApp() {
   app.use('/api/test-runner', buildTestRunnerRoutes(db));
   app.use('/api/logs', buildLogsRoutes(db));
   app.use('/api/icons', buildIconsRoutes(db));
+  app.use('/api/design', buildDesignRoutes(db));
 
   app.use((req, res) => res.status(404).json({ error: 'NOT_FOUND', path: req.path }));
   // El error handler recibe el repo para persistir excepciones no manejadas.
