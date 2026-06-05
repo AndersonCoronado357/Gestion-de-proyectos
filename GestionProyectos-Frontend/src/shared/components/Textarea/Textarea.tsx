@@ -18,7 +18,18 @@ export interface TextareaProps
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   function Textarea(
-    { label, hint, error, rows = 4, className, wrapperClassName, id, ...props },
+    {
+      label,
+      hint,
+      error,
+      rows = 4,
+      className,
+      wrapperClassName,
+      id,
+      // Sin sugerencias del navegador por default.
+      autoComplete = 'off',
+      ...props
+    },
     ref
   ) {
     const reactId = useId();
@@ -40,6 +51,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={tId}
           rows={rows}
+          autoComplete={autoComplete}
           aria-invalid={hasError || undefined}
           className={cn(
             // Sin resize manual por defecto (sin el "agarrador" en la esquina).

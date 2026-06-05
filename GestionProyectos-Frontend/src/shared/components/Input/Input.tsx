@@ -17,7 +17,21 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { label, hint, error, leftIcon, rightIcon, className, id, type = 'text', ...props },
+  {
+    label,
+    hint,
+    error,
+    leftIcon,
+    rightIcon,
+    className,
+    id,
+    type = 'text',
+    // Por default sin sugerencias del navegador. Las pantallas que
+    // necesitan autocompletado semántico (login, register, etc.) lo
+    // sobreescriben pasando `autoComplete="username"` u otro valor.
+    autoComplete = 'off',
+    ...props
+  },
   ref
 ) {
   const reactId = useId();
@@ -49,6 +63,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           ref={ref}
           id={inputId}
           type={actualType}
+          autoComplete={autoComplete}
           aria-invalid={hasError || undefined}
           className={cn(
             'h-9 w-full rounded-md text-[12.5px] outline-none transition-colors',

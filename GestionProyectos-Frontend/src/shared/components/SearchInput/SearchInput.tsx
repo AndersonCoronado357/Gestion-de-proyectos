@@ -25,7 +25,14 @@ export interface SearchInputProps
 
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   function SearchInput(
-    { className, placeholder = 'Buscar', variant = 'default', ...props },
+    {
+      className,
+      placeholder = 'Buscar',
+      variant = 'default',
+      // Sin sugerencias del navegador por default.
+      autoComplete = 'off',
+      ...props
+    },
     ref
   ) {
     const v = variants[variant];
@@ -44,6 +51,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           ref={ref}
           type="search"
           placeholder={placeholder}
+          autoComplete={autoComplete}
           className={cn(
             'search-clean h-8 w-full rounded-md border-0 pl-8 pr-2.5',
             'text-[12px] font-normal outline-none',
