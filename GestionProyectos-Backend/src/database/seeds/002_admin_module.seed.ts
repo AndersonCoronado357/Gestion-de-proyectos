@@ -19,6 +19,7 @@ const ICON_KEY = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fi
 const ICON_USER = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>`;
 const ICON_PUZZLE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h4V4a2 2 0 1 1 4 0v3h4v4a2 2 0 1 0 0 4v4h-4a2 2 0 1 0-4 0H4v-4a2 2 0 1 1 0-4V7Z"/></svg>`;
 const ICON_PANEL = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M13 4v16"/></svg>`;
+const ICON_LAYERS = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>`;
 
 export async function seed(knex: Knex): Promise<void> {
   // ── Limpieza de módulos legacy ───────────────────────────────
@@ -64,39 +65,46 @@ export async function seed(knex: Knex): Promise<void> {
   //   El front mapea folder_key → React component (ver routes.config.tsx).
   const subs = [
     {
-      name: 'Módulos y submódulos',
+      name: 'Módulos',
       icon: ICON_BOX,
       path: '/administracion/modulos',
       folder: 'modules-and-submodules',
       order: 1
     },
     {
+      name: 'Submódulos',
+      icon: ICON_LAYERS,
+      path: '/administracion/submodulos',
+      folder: 'page-builder',
+      order: 2
+    },
+    {
       name: 'Roles y permisos',
       icon: ICON_KEY,
       path: '/administracion/roles',
       folder: 'roles-and-permissions',
-      order: 2
+      order: 3
     },
     {
       name: 'Usuarios',
       icon: ICON_USER,
       path: '/administracion/usuarios',
       folder: 'users',
-      order: 3
+      order: 4
     },
     {
       name: 'Componentes',
       icon: ICON_PUZZLE,
       path: '/administracion/componentes',
       folder: 'components',
-      order: 4
+      order: 5
     },
     {
       name: 'Contenido del login',
       icon: ICON_PANEL,
       path: '/administracion/login',
       folder: 'login-content',
-      order: 5
+      order: 6
     }
   ];
 
