@@ -104,10 +104,31 @@ export function findItemByPathIn(
   items: SidebarItem[],
   path: string
 ): SidebarRoutable | null {
+  // 1) Match exacto — la URL coincide con un item del sidebar.
   for (const item of items) {
     if (item.path === path) return item;
     const child = item.children?.find((c) => c.path === path);
     if (child) return child;
   }
-  return null;
+  // 2) Fallback: prefijo MÁS LARGO. Cuando navegamos a una sub-ruta
+  //    (p. ej. /administracion/submodulos/42) que no tiene su propia
+  //    entrada en el sidebar, marcamos la entrada del prefijo más
+  //    específico (`/administracion/submodulos`) para que el usuario
+  //    siga viendo dónde está parado.
+  let bestItem: SidebarRoutable | null = null;
+  let bestLen = 0;
+  const consider = (candidate: SidebarRoutable, candidatePath: string): void => {
+    if (!path.startsWith(candidatePath + '/')) return;
+    if (bestItem == null || candidatePath.length > bestLen) {
+      bestItem = candidate;
+      bestLen = candidatePath.length;
+    }
+  };
+  for (const item of items) {
+    if (item.path) consider(item, item.path);
+    if (item.children) {
+      for (const child of item.children) consider(child, child.path);
+    }
+  }
+  return bestItem;
 }

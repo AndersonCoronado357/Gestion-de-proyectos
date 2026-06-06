@@ -73,12 +73,12 @@ export default function Layout({ children }: LayoutProps) {
   const { module, child } = findActiveContextIn(allItems, activeId);
   // Títulos para rutas fijas que no están en la tree de navegación.
   const FIXED_TITLES: Record<string, string> = {
-    '/administracion/modulos/editor': 'Editor de submódulos'
+    '/administracion/submodulos': 'Submódulos'
   };
   // Rutas con prefijo (los :params no matchean en el record).
   const prefixTitle = ((): string | null => {
-    if (location.pathname.startsWith('/administracion/modulos/editor/'))
-      return 'Editor de submódulos';
+    if (location.pathname.startsWith('/administracion/submodulos/'))
+      return 'Submódulo';
     if (
       location.pathname.startsWith('/administracion/diseno/') &&
       location.pathname.endsWith('/preview')

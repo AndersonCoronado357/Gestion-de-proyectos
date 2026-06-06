@@ -3,7 +3,7 @@ import Layout from './shared/components/Layout/index.js';
 import LoginPage from './modules/auth/ui/pages/LoginPage.js';
 import SettingsPage from './modules/settings/ui/pages/SettingsPage.js';
 import HomePage from './modules/home/ui/pages/HomePage.js';
-import CreateSubmoduleHubPage from './modules/page-builder/ui/pages/CreateSubmoduleHubPage.js';
+import SubmoduleHubPage from './modules/page-builder/ui/pages/SubmoduleHubPage.js';
 import SubmoduleListPage from './modules/page-builder/ui/pages/SubmoduleListPage.js';
 import DesignEditorPage from './modules/design/ui/pages/DesignEditorPage.js';
 import DesignPreviewPage from './modules/design/ui/pages/PreviewPage.js';
@@ -100,20 +100,31 @@ export default function App() {
         <Route path={defaultPath} element={<HomePage />} />
         {/* /configuracion es fijo — preferencias del usuario, fuera del builder. */}
         <Route path="/configuracion" element={<SettingsPage />} />
-        {/* Lista intermedia: submódulos en edición. */}
+        {/* Lista de submódulos en edición. */}
         <Route
-          path="/administracion/modulos/editor"
+          path="/administracion/submodulos"
           element={<SubmoduleListPage />}
         />
-        {/* Hub del submódulo seleccionado (árbol de carpetas + 5 opciones). */}
+        {/* Hub del submódulo seleccionado (árbol de carpetas + 5 secciones). */}
+        <Route
+          path="/administracion/submodulos/:id"
+          element={<SubmoduleHubPage />}
+        />
+        {/* Compatibilidad con URLs viejas: TODAS redirigen a la lista
+            (sin preservar el id), así si quedó algún navigate cacheado
+            que apunte a la ruta vieja con id, igual cae en la lista —
+            no se reabre el hub solo. */}
+        <Route
+          path="/administracion/modulos/editor"
+          element={<Navigate to="/administracion/submodulos" replace />}
+        />
         <Route
           path="/administracion/modulos/editor/:id"
-          element={<CreateSubmoduleHubPage />}
+          element={<Navigate to="/administracion/submodulos" replace />}
         />
-        {/* Compatibilidad con la URL vieja del Hub sin id → redirige a la lista. */}
         <Route
           path="/administracion/modulos/crear-submodulo"
-          element={<Navigate to="/administracion/modulos/editor" replace />}
+          element={<Navigate to="/administracion/submodulos" replace />}
         />
         {dynamicRoutes.map((r) => (
           <Route key={r.key} path={r.path} element={r.element} />
