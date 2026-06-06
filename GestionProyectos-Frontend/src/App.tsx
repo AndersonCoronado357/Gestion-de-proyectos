@@ -4,6 +4,9 @@ import LoginPage from './modules/auth/ui/pages/LoginPage.js';
 import SettingsPage from './modules/settings/ui/pages/SettingsPage.js';
 import HomePage from './modules/home/ui/pages/HomePage.js';
 import CreateSubmoduleHubPage from './modules/page-builder/ui/pages/CreateSubmoduleHubPage.js';
+import SubmoduleListPage from './modules/page-builder/ui/pages/SubmoduleListPage.js';
+import DesignEditorPage from './modules/design/ui/pages/DesignEditorPage.js';
+import DesignPreviewPage from './modules/design/ui/pages/PreviewPage.js';
 import { useMemo } from 'react';
 import { ProtectedRoute } from './modules/auth/ui/ProtectedRoute.js';
 import { InactivityGuard } from './modules/auth/ui/InactivityGuard.js';
@@ -75,15 +78,42 @@ export default function App() {
           /inicio o a /login. */}
       <Route path="/" element={<Navigate to={defaultPath} replace />} />
       <Route path="/login" element={<LoginPage />} />
+      {/* Editor fullscreen del Diseñador: fuera del Layout normal para
+          ocupar toda la pantalla. Sigue protegido por sesión. */}
+      <Route
+        path="/administracion/diseno/:id"
+        element={
+          <ProtectedRoute>
+            <DesignEditorPage />
+          </ProtectedRoute>
+        }
+      />
       <Route element={<AppLayout />}>
+        {/* La vista previa del Diseñador SÍ va dentro del Layout normal
+            (sidebar + header reales) para que se vea exacto como quedaría
+            publicado. */}
+        <Route
+          path="/administracion/diseno/:id/preview"
+          element={<DesignPreviewPage />}
+        />
         {/* /inicio es fijo — vista landing, no proviene de la tabla `modules`. */}
         <Route path={defaultPath} element={<HomePage />} />
         {/* /configuracion es fijo — preferencias del usuario, fuera del builder. */}
         <Route path="/configuracion" element={<SettingsPage />} />
-        {/* Hub al crear un submódulo. */}
+        {/* Lista intermedia: submódulos en edición. */}
+        <Route
+          path="/administracion/modulos/editor"
+          element={<SubmoduleListPage />}
+        />
+        {/* Hub del submódulo seleccionado (árbol de carpetas + 5 opciones). */}
+        <Route
+          path="/administracion/modulos/editor/:id"
+          element={<CreateSubmoduleHubPage />}
+        />
+        {/* Compatibilidad con la URL vieja del Hub sin id → redirige a la lista. */}
         <Route
           path="/administracion/modulos/crear-submodulo"
-          element={<CreateSubmoduleHubPage />}
+          element={<Navigate to="/administracion/modulos/editor" replace />}
         />
         {dynamicRoutes.map((r) => (
           <Route key={r.key} path={r.path} element={r.element} />
