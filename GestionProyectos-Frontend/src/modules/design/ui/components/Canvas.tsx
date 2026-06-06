@@ -12,6 +12,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type DragEvent,
@@ -228,13 +229,17 @@ export default function Canvas({
     return { x: (cx - r.left - pan.x) / zoom, y: (cy - r.top - pan.y) / zoom };
   };
 
-  // Frames con sus rects — siempre el tamaño persistido (consistente
-  // con la previa: lo que el viewer ve usa el mismo frame.w/h como
-  // referencia para el anchoring).
-  const framesWithRect = views.map((v, i) => ({
-    view: v,
-    rect: layouts[v.id]?.frame ?? defaultFrameRect(i)
-  }));
+  // Frames con sus rects. MEMO crítico: sin esto el array se recrea
+  // en CADA render (incluyendo pan/zoom) y dispara los useEffects que
+  // lo tienen como dep — causando lag al hacer scroll/zoom rápido.
+  const framesWithRect = useMemo(
+    () =>
+      views.map((v, i) => ({
+        view: v,
+        rect: layouts[v.id]?.frame ?? defaultFrameRect(i)
+      })),
+    [views, layouts]
+  );
 
 
   // ── Atajos ────────────────────────────────────────────────────────
@@ -339,11 +344,23 @@ export default function Canvas({
 
   useEffect(() => {
     if (!panning) return;
-    const move = (e: PointerEvent): void => {
+    // rAF batching: pointermove a 144Hz se reduce a 60fps; varios
+    // eventos por frame se coalescen al último (sólo importa el
+    // delta final desde el inicio del pan).
+    let raf = 0;
+    let lastE: PointerEvent | null = null;
+    const flush = (): void => {
+      raf = 0;
+      const e = lastE;
+      if (!e) return;
       setPan({
         x: panning.startPanX + (e.clientX - panning.startClientX),
         y: panning.startPanY + (e.clientY - panning.startClientY)
       });
+    };
+    const move = (e: PointerEvent): void => {
+      lastE = e;
+      if (!raf) raf = requestAnimationFrame(flush);
     };
     const up = (): void => setPanning(null);
     window.addEventListener('pointermove', move);
@@ -353,42 +370,97 @@ export default function Canvas({
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
       window.removeEventListener('pointercancel', up);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, [panning]);
 
   // ── Zoom (controlado) ──────────────────────────────────────────────
+  // Refs sincronizados con el zoom actual y el callback onZoomChange,
+  // así `applyZoom` puede ser ESTABLE (sin recrearse en cada tic de la
+  // rueda) y el listener del wheel se registra UNA sola vez, no en
+  // cada cambio. Sin esto, cada wheel-tick unmount+mount el listener,
+  // generando un freeze visible al hacer zoom+pan rápido.
+  const zoomRef = useRef(zoom);
+  useEffect(() => {
+    zoomRef.current = zoom;
+  }, [zoom]);
+  const onZoomChangeRef = useRef(onZoomChange);
+  useEffect(() => {
+    onZoomChangeRef.current = onZoomChange;
+  }, [onZoomChange]);
+
   const applyZoom = useCallback(
     (nextZoom: number, anchorClientX?: number, anchorClientY?: number): void => {
+      const cur = zoomRef.current;
       const clamped = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, nextZoom));
       const el = viewportRef.current;
       if (el && anchorClientX != null && anchorClientY != null) {
         const rect = el.getBoundingClientRect();
         const ax = anchorClientX - rect.left;
         const ay = anchorClientY - rect.top;
-        const k = clamped / zoom;
+        const k = clamped / cur;
         setPan((p) => ({ x: ax - (ax - p.x) * k, y: ay - (ay - p.y) * k }));
       }
-      onZoomChange(clamped, anchorClientX, anchorClientY);
+      onZoomChangeRef.current(clamped, anchorClientX, anchorClientY);
     },
-    [zoom, onZoomChange]
+    []
   );
 
+  // rAF batching para wheel: múltiples eventos por frame se acumulan
+  // en `pending` y se aplican UNA sola vez en el próximo paint.
+  // Sin esto, una rueda rápida dispara N setState en el mismo frame,
+  // forzando N reconciliaciones consecutivas → lag perceptible.
   useEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
-    const handler = (e: WheelEvent): void => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        const delta = -e.deltaY * 0.0015;
-        applyZoom(zoom * (1 + delta), e.clientX, e.clientY);
-      } else {
-        e.preventDefault();
-        setPan((p) => ({ x: p.x - e.deltaX, y: p.y - e.deltaY }));
+    const pending = {
+      panDX: 0,
+      panDY: 0,
+      zoomFactor: 1,
+      anchorX: 0,
+      anchorY: 0,
+      hasZoom: false
+    };
+    let raf = 0;
+    const flush = (): void => {
+      raf = 0;
+      if (pending.hasZoom) {
+        applyZoom(
+          zoomRef.current * pending.zoomFactor,
+          pending.anchorX,
+          pending.anchorY
+        );
+        pending.zoomFactor = 1;
+        pending.hasZoom = false;
+      }
+      if (pending.panDX !== 0 || pending.panDY !== 0) {
+        const dx = pending.panDX;
+        const dy = pending.panDY;
+        pending.panDX = 0;
+        pending.panDY = 0;
+        setPan((p) => ({ x: p.x - dx, y: p.y - dy }));
       }
     };
+    const handler = (e: WheelEvent): void => {
+      e.preventDefault();
+      if (e.ctrlKey || e.metaKey) {
+        const delta = -e.deltaY * 0.0015;
+        pending.zoomFactor *= 1 + delta;
+        pending.anchorX = e.clientX;
+        pending.anchorY = e.clientY;
+        pending.hasZoom = true;
+      } else {
+        pending.panDX += e.deltaX;
+        pending.panDY += e.deltaY;
+      }
+      if (!raf) raf = requestAnimationFrame(flush);
+    };
     el.addEventListener('wheel', handler, { passive: false });
-    return () => el.removeEventListener('wheel', handler);
-  }, [applyZoom, zoom]);
+    return () => {
+      el.removeEventListener('wheel', handler);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [applyZoom]);
 
   // (framesWithRect ya está definido más arriba)
 
@@ -785,15 +857,15 @@ export default function Canvas({
       }}
     >
       {/*
-        Dos wrappers para tener calidad nítida en zoom:
-          - Exterior: pan vía `transform: translate` (no afecta nitidez).
-          - Interior: zoom vía CSS `zoom` (re-rasteriza el contenido al
-            tamaño nuevo en vez de interpolar pixels → texto/SVG crisp).
+        UN solo layer con `transform: translate + scale` combinado:
+        GPU-compositado, sin reflow ni re-raster por evento. CSS `zoom`
+        (que se usaba antes para preservar nitidez) causaba reflow en
+        cada cambio → lag perceptible al hacer pan/zoom rápido.
       */}
       <div
         className="absolute left-0 top-0"
         style={{
-          transform: `translate(${pan.x}px, ${pan.y}px)`,
+          transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
           transformOrigin: '0 0',
           willChange: 'transform'
         } as React.CSSProperties}
@@ -801,7 +873,6 @@ export default function Canvas({
         <div
           className="relative"
           style={{
-            zoom: zoom,
             textRendering: 'geometricPrecision' as React.CSSProperties['textRendering'],
             WebkitFontSmoothing: 'antialiased',
             MozOsxFontSmoothing: 'grayscale'

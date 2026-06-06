@@ -221,9 +221,12 @@ export function externalTooltip(context: { chart: ChartJS; tooltip: any }): void
 
   content.innerHTML = head + rows;
   el.style.background = bg;
-  el.style.border = `1px solid ${border}`;
+  // Sin border de color — solo la sombra define el tooltip. El border
+  // del tema (token --color-border) en dark mode aparecía como una
+  // línea visible alrededor del tooltip.
+  el.style.border = 'none';
   el.style.borderRadius = '12px';
-  el.style.boxShadow = '0 12px 32px -8px rgba(0,0,0,.30), 0 2px 8px rgba(0,0,0,.12)';
+  el.style.boxShadow = '0 12px 32px -8px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.20)';
   el.style.padding = '9px 12px';
   el.style.font = '12px Inter, system-ui, sans-serif';
 

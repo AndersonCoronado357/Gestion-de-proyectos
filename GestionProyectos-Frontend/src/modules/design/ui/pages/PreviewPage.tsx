@@ -45,7 +45,7 @@ export default function PreviewPage() {
           type="button"
           onClick={() => {
             if (window.innerWidth < 768) {
-              navigate('/administracion/modulos/editor');
+              navigate('/administracion/submodulos');
             } else {
               navigate(`/administracion/diseno/${projectId}`);
             }

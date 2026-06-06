@@ -105,6 +105,17 @@ export function useDesignEditor(projectId: number | null): DesignEditor {
 
   const dirtyRef = useRef<Set<number>>(new Set());
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Refs sincronizados con el estado para que `flushDirty` siempre
+  // lea el último valor — incluso al ejecutarse desde el cleanup de
+  // unmount (que captura por closure la versión de mount).
+  const projectRef = useRef<DesignProject | null>(null);
+  const layoutsRef = useRef<LayoutsByView>({});
+  useEffect(() => {
+    projectRef.current = project;
+  }, [project]);
+  useEffect(() => {
+    layoutsRef.current = layouts;
+  }, [layouts]);
 
   // ── Carga inicial ────────────────────────────────────────────────
   useEffect(() => {
@@ -143,17 +154,22 @@ export function useDesignEditor(projectId: number | null): DesignEditor {
   }, [projectId]);
 
   // ── Autoguardado debounced (por frame) ────────────────────────────
+  // Lee project/layouts de refs, NO del closure → función estable
+  // (sin deps) que en el cleanup de unmount serializa los últimos
+  // valores, no los del primer render.
   const flushDirty = useCallback(async () => {
-    if (!project) return;
+    const p = projectRef.current;
+    if (!p) return;
     const pending = Array.from(dirtyRef.current);
     if (pending.length === 0) return;
     dirtyRef.current.clear();
     setSaving(true);
     try {
+      const current = layoutsRef.current;
       for (const viewId of pending) {
-        const content = layouts[viewId];
+        const content = current[viewId];
         if (!content) continue;
-        await apiUpdateView(project.id, viewId, {
+        await apiUpdateView(p.id, viewId, {
           contentDesktop: serializeLayout(content)
         });
       }
@@ -163,7 +179,7 @@ export function useDesignEditor(projectId: number | null): DesignEditor {
     } finally {
       setSaving(false);
     }
-  }, [project, layouts]);
+  }, []);
 
   const scheduleSave = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);

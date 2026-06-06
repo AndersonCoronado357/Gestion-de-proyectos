@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '../../../../shared/lib/cn.js';
-import Skeleton from '../../../../shared/components/Skeleton/index.js';
 import EditorTopBar from '../components/EditorTopBar.js';
 import Canvas from '../components/Canvas.js';
 import ComponentsPanel from '../components/ComponentsPanel.js';
@@ -47,12 +46,20 @@ export default function DesignEditorPage() {
     );
   }
   if (e.loading && !e.project) {
+    // Loader silencioso del editor: barra superior + sidebar + canvas
+    // todos en el color de fondo del editor con un spinner discreto
+    // centrado. Nada de skeletons grises ruidosos.
     return (
-      <div className="flex h-screen w-full flex-col">
-        <Skeleton variant="rect" width="100%" height={48} />
-        <div className="flex flex-1">
-          <Skeleton variant="rect" width={240} height="100%" />
-          <Skeleton variant="rect" width="100%" height="100%" className="flex-1" />
+      <div className="flex h-screen w-full flex-col bg-page">
+        <div className="h-12 shrink-0 bg-bg" />
+        <div className="flex min-h-0 flex-1">
+          <div className="h-full w-[240px] shrink-0 border-r border-border-subtle bg-bg" />
+          <div className="relative flex min-w-0 flex-1 items-center justify-center">
+            <div className="flex items-center gap-2 text-[12px] text-fg-faint">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+              <span>Cargando diseño…</span>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -88,7 +95,7 @@ export default function DesignEditorPage() {
         onAddView={async () => {
           await e.addView();
         }}
-        onBack={() => navigate(`/administracion/modulos/editor/${e.project!.id}`)}
+        onBack={() => navigate(`/administracion/submodulos/${e.project!.id}`)}
       />
 
       <div className="flex min-h-0 flex-1">

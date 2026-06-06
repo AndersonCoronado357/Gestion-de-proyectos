@@ -89,7 +89,7 @@ export default function ComponentsPanel({ onAddBlock }: Props) {
                         donde heredar, y se escala dinámicamente para entrar
                         en el thumbnail. */}
                     <span
-                      className="pointer-events-none flex h-7 w-10 shrink-0 items-center justify-center overflow-hidden rounded bg-bg ring-1 ring-border-subtle"
+                      className="pointer-events-none flex h-7 w-10 shrink-0 items-center justify-center overflow-hidden rounded bg-bg-muted"
                     >
                       <span
                         className="block"
