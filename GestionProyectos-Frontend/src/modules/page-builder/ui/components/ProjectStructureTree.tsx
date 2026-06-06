@@ -1,14 +1,15 @@
-// ProjectStructureTree — vista previa de la estructura que va a tener
-// el nuevo submódulo (backend + frontend, arquitectura hexagonal
-// completa).
+// ProjectStructureTree — estructura del submódulo (backend + frontend,
+// hexagonal completa).
 //
 // Los nombres tipo `{name}` y `{Name}` se sustituyen en tiempo de
 // render por el nombre del submódulo (slug y PascalCase respectivamente).
-// Si el nombre todavía está vacío, se muestra el placeholder.
+// Las páginas de Front en `ui/pages/` se inyectan a partir de las vistas
+// que el usuario creó en el editor visual — así el árbol refleja en
+// automático lo que se está diseñando, sin botones extra.
 //
 // Las carpetas son colapsables.
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { cn } from '../../../../shared/lib/cn.js';
 import {
   FileIcon,
@@ -55,163 +56,164 @@ const USE_CASES_NODE: TreeNode = {
 const BACKEND_USE_CASES = USE_CASES_NODE;
 const FRONTEND_USE_CASES = USE_CASES_NODE;
 
-const TREE: ReadonlyArray<TreeNode> = [
-  {
-    name: 'GestionProyectos-Backend',
-    kind: 'folder',
-    children: [
-      {
-        name: '{name}',
-        kind: 'folder',
-        children: [
-          {
-            name: 'adapters',
-            kind: 'folder',
-            children: [
-              {
-                name: 'entry',
-                kind: 'folder',
-                children: [
-                  { name: '{name}.controller.ts', kind: 'file' },
-                  { name: '{name}.routes.ts', kind: 'file' }
-                ]
-              },
-              {
-                name: 'exit',
-                kind: 'folder',
-                children: [
-                  { name: '{name}.cache.adapter.ts', kind: 'file' },
-                  { name: '{name}.repository.impl.ts', kind: 'file' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'domain',
-            kind: 'folder',
-            children: [
-              { name: '{name}.entity.ts', kind: 'file' },
-              { name: '{name}.value-objects.ts', kind: 'file' }
-            ]
-          },
-          {
-            name: 'dtos',
-            kind: 'folder',
-            children: [
-              { name: 'create-{name}.dto.ts', kind: 'file' },
-              { name: 'update-{name}.dto.ts', kind: 'file' }
-            ]
-          },
-          {
-            name: 'ports',
-            kind: 'folder',
-            children: [{ name: '{name}.repository.ts', kind: 'file' }]
-          },
-          BACKEND_USE_CASES,
-          {
-            name: 'validators',
-            kind: 'folder',
-            children: [{ name: '{name}.validator.ts', kind: 'file' }]
-          }
-        ]
-      },
-      {
-        name: 'database',
-        kind: 'folder',
-        children: [
-          {
-            name: 'migrations',
-            kind: 'folder',
-            children: [{ name: '00X_create_{name}.ts', kind: 'file' }]
-          },
-          {
-            name: 'seeds',
-            kind: 'folder',
-            children: [{ name: '00X_{name}.seed.ts', kind: 'file' }]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    name: 'GestionProyectos-Frontend',
-    kind: 'folder',
-    children: [
-      {
-        name: '{name}',
-        kind: 'folder',
-        children: [
-          {
-            name: 'adapters',
-            kind: 'folder',
-            children: [
-              {
-                name: 'entry',
-                kind: 'folder',
-                children: [{ name: '{name}.api.ts', kind: 'file' }]
-              },
-              {
-                name: 'exit',
-                kind: 'folder',
-                children: [{ name: '{name}.http.adapter.ts', kind: 'file' }]
-              }
-            ]
-          },
-          {
-            name: 'domain',
-            kind: 'folder',
-            children: [
-              { name: '{name}.entity.ts', kind: 'file' },
-              { name: '{name}.value-objects.ts', kind: 'file' }
-            ]
-          },
-          {
-            name: 'dtos',
-            kind: 'folder',
-            children: [
-              { name: 'create-{name}.dto.ts', kind: 'file' },
-              { name: 'update-{name}.dto.ts', kind: 'file' }
-            ]
-          },
-          {
-            name: 'ports',
-            kind: 'folder',
-            children: [{ name: '{name}.repository.ts', kind: 'file' }]
-          },
-          {
-            name: 'ui',
-            kind: 'folder',
-            children: [
-              {
-                name: 'components',
-                kind: 'folder',
-                children: [
-                  { name: '{Name}Form.tsx', kind: 'file' },
-                  { name: '{Name}Item.tsx', kind: 'file' },
-                  { name: '{Name}List.tsx', kind: 'file' }
-                ]
-              },
-              {
-                name: 'hooks',
-                kind: 'folder',
-                children: [{ name: 'use{Name}.ts', kind: 'file' }]
-              },
-              {
-                name: 'pages',
-                kind: 'folder',
-                children: [
-                  { name: '{Name}DetailPage.tsx', kind: 'file' },
-                  { name: '{Name}ListPage.tsx', kind: 'file' }
-                ]
-              }
-            ]
-          },
-          FRONTEND_USE_CASES
-        ]
-      }
-    ]
-  }
-];
+// Construye el árbol con las vistas del Front inyectadas como archivos
+// dentro de `ui/pages/`. Cada nombre de vista (e.g. "Vista 1", "Detalle")
+// se renderea como `{Name}<ViewPascal>Page.tsx` — coincide 1:1 con lo
+// que escribe el endpoint /builder/publish-design.
+function buildTree(viewPascalNames: string[]): ReadonlyArray<TreeNode> {
+  const pageChildren: TreeNode[] =
+    viewPascalNames.length > 0
+      ? viewPascalNames.map((v) => ({
+          name: `{Name}${v}Page.tsx`,
+          kind: 'file' as const
+        }))
+      : [{ name: '{Name}ListPage.tsx', kind: 'file' }];
+  return [
+    {
+      name: 'GestionProyectos-Backend',
+      kind: 'folder',
+      children: [
+        {
+          name: '{name}',
+          kind: 'folder',
+          children: [
+            {
+              name: 'adapters',
+              kind: 'folder',
+              children: [
+                {
+                  name: 'entry',
+                  kind: 'folder',
+                  children: [
+                    { name: '{name}.controller.ts', kind: 'file' },
+                    { name: '{name}.routes.ts', kind: 'file' }
+                  ]
+                },
+                {
+                  name: 'exit',
+                  kind: 'folder',
+                  children: [
+                    { name: '{name}.cache.adapter.ts', kind: 'file' },
+                    { name: '{name}.repository.impl.ts', kind: 'file' }
+                  ]
+                }
+              ]
+            },
+            {
+              name: 'domain',
+              kind: 'folder',
+              children: [
+                { name: '{name}.entity.ts', kind: 'file' },
+                { name: '{name}.value-objects.ts', kind: 'file' }
+              ]
+            },
+            {
+              name: 'dtos',
+              kind: 'folder',
+              children: [
+                { name: 'create-{name}.dto.ts', kind: 'file' },
+                { name: 'update-{name}.dto.ts', kind: 'file' }
+              ]
+            },
+            {
+              name: 'ports',
+              kind: 'folder',
+              children: [{ name: '{name}.repository.ts', kind: 'file' }]
+            },
+            BACKEND_USE_CASES,
+            {
+              name: 'validators',
+              kind: 'folder',
+              children: [{ name: '{name}.validator.ts', kind: 'file' }]
+            }
+          ]
+        },
+        {
+          name: 'database',
+          kind: 'folder',
+          children: [
+            {
+              name: 'migrations',
+              kind: 'folder',
+              children: [{ name: '00X_create_{name}.ts', kind: 'file' }]
+            },
+            {
+              name: 'seeds',
+              kind: 'folder',
+              children: [{ name: '00X_{name}.seed.ts', kind: 'file' }]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: 'GestionProyectos-Frontend',
+      kind: 'folder',
+      children: [
+        {
+          name: '{name}',
+          kind: 'folder',
+          children: [
+            {
+              name: 'adapters',
+              kind: 'folder',
+              children: [
+                {
+                  name: 'entry',
+                  kind: 'folder',
+                  children: [{ name: '{name}.api.ts', kind: 'file' }]
+                },
+                {
+                  name: 'exit',
+                  kind: 'folder',
+                  children: [{ name: '{name}.http.adapter.ts', kind: 'file' }]
+                }
+              ]
+            },
+            {
+              name: 'domain',
+              kind: 'folder',
+              children: [
+                { name: '{name}.entity.ts', kind: 'file' },
+                { name: '{name}.value-objects.ts', kind: 'file' }
+              ]
+            },
+            {
+              name: 'dtos',
+              kind: 'folder',
+              children: [
+                { name: 'create-{name}.dto.ts', kind: 'file' },
+                { name: 'update-{name}.dto.ts', kind: 'file' }
+              ]
+            },
+            {
+              name: 'ports',
+              kind: 'folder',
+              children: [{ name: '{name}.repository.ts', kind: 'file' }]
+            },
+            {
+              name: 'ui',
+              kind: 'folder',
+              children: [
+                {
+                  name: 'hooks',
+                  kind: 'folder',
+                  children: [{ name: 'use{Name}.ts', kind: 'file' }]
+                },
+                {
+                  name: 'pages',
+                  kind: 'folder',
+                  children: pageChildren
+                }
+              ]
+            },
+            FRONTEND_USE_CASES
+          ]
+        }
+      ]
+    }
+  ];
+}
 
 // ── Sustitución de nombres ────────────────────────────────────────────
 
@@ -431,15 +433,26 @@ function TreeRow({ node, depth, path, expanded, name, onToggle }: TreeRowProps) 
 
 interface ProjectStructureTreeProps {
   name: string;
+  /** Nombres de las vistas creadas en el editor visual. Cada una se
+   *  inyecta como `{Name}<ViewPascal>Page.tsx` dentro de `ui/pages/`. */
+  viewNames?: string[];
   onBack: () => void;
 }
 
 export default function ProjectStructureTree({
   name,
+  viewNames,
   onBack
 }: ProjectStructureTreeProps) {
+  const tree = useMemo(() => {
+    const pascals = (viewNames ?? [])
+      .map((v) => pascalize(v))
+      .filter((v) => v.length > 0);
+    return buildTree(pascals);
+  }, [viewNames]);
+
   const [expanded, setExpanded] = useState<Set<string>>(
-    () => new Set(collectAllFolderPaths(TREE))
+    () => new Set(collectAllFolderPaths(tree))
   );
 
   const toggle = (path: string) => {
@@ -454,7 +467,7 @@ export default function ProjectStructureTree({
   // Colapsar / expandir TODAS las carpetas de un golpe.
   const allCollapsed = expanded.size === 0;
   const toggleAll = () =>
-    setExpanded(allCollapsed ? new Set(collectAllFolderPaths(TREE)) : new Set());
+    setExpanded(allCollapsed ? new Set(collectAllFolderPaths(tree)) : new Set());
 
   return (
     <div className="flex flex-col lg:h-full lg:min-h-0">
@@ -488,7 +501,7 @@ export default function ProjectStructureTree({
         </button>
       </div>
       <div className="py-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
-        {TREE.map((node) => (
+        {tree.map((node) => (
           <TreeRow
             key={node.name}
             node={node}
