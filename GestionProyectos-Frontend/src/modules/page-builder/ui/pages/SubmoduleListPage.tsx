@@ -17,6 +17,8 @@ import {
 } from '../../../../shared/icons/index.js';
 import { useToast } from '../../../../shared/components/Toast/index.js';
 import { useDesignsList } from '../../../design/ui/hooks/useDesignsList.js';
+import { scaffoldSubmodule } from '../../api.js';
+import { appLog } from '../../../logs/logger.js';
 
 function formatDate(iso: string): string {
   try {
@@ -43,13 +45,31 @@ export default function SubmoduleListPage() {
     if (!n || creating) return;
     setCreating(true);
     try {
+      // Primero generamos los archivos en disco (clon de module-x).
+      // Si ya existían (409) el helper devuelve null y seguimos solo
+      // con el design_project — esto cubre el caso de reabrir un
+      // submódulo que ya fue creado antes.
+      await scaffoldSubmodule(n);
       const p = await list.create(n);
       setNewName('');
-      if (p) navigate(`/administracion/modulos/editor/${p.id}`);
+      // Soft-nav (React Router): conserva la sesión, AuthContext, cache
+      // de navegación y bundles ya cargados — no hay reload del browser
+      // así nada puede "rebotar" a la lista por un useEffect que se
+      // remonta o un bundle stale.  Pasamos el proyecto recién creado
+      // por `state` para que el Hub pinte instantáneo sin esperar al
+      // GET /design/projects/:id.
+      if (p) navigate(`/administracion/submodulos/${p.id}`, {
+        replace: true,
+        state: { project: p }
+      });
     } catch (e) {
-      toast.error({
-        title: 'No se pudo crear',
-        message: e instanceof Error ? e.message : 'Inténtalo de nuevo.'
+      const msg = e instanceof Error ? e.message : 'Inténtalo de nuevo.';
+      toast.error({ title: 'No se pudo crear', message: msg });
+      appLog.error(`No se pudo crear submódulo: ${msg}`, {
+        category: 'app',
+        loggerName: 'SubmoduleListPage.handleCreate',
+        stackTrace: e instanceof Error ? e.stack ?? null : null,
+        context: { name: n }
       });
     } finally {
       setCreating(false);
@@ -129,7 +149,7 @@ export default function SubmoduleListPage() {
                 >
                   <button
                     type="button"
-                    onClick={() => navigate(`/administracion/modulos/editor/${p.id}`)}
+                    onClick={() => navigate(`/administracion/submodulos/${p.id}`)}
                     className="absolute inset-0 rounded-xl outline-none"
                     aria-label={`Abrir ${p.name}`}
                   />
