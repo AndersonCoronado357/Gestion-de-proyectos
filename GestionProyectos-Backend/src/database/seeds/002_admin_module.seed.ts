@@ -20,12 +20,14 @@ const ICON_USER = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" f
 const ICON_PUZZLE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h4V4a2 2 0 1 1 4 0v3h4v4a2 2 0 1 0 0 4v4h-4a2 2 0 1 0-4 0H4v-4a2 2 0 1 1 0-4V7Z"/></svg>`;
 const ICON_PANEL = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M13 4v16"/></svg>`;
 const ICON_LAYERS = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>`;
+const ICON_PLUG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6"/><path d="M15 2v6"/><path d="M7 8h10v3a5 5 0 0 1-5 5 5 5 0 0 1-5-5V8Z"/><path d="M12 16v6"/></svg>`;
+const ICON_GRID = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>`;
 
 export async function seed(knex: Knex): Promise<void> {
   // ── Limpieza de módulos legacy ───────────────────────────────
-  // Cualquier módulo distinto a "Administración" que haya quedado de
-  // seeds anteriores se soft-deletea junto con sus submódulos. Esto
-  // mantiene el sidebar limpio: sólo se ve lo que está en este seed
+  // Cualquier módulo que NO esté en la lista blanca de top-levels
+  // ("Administración", "APIs") se soft-deletea junto con sus submódulos.
+  // Esto mantiene el sidebar limpio: sólo se ve lo que está en este seed
   // más lo que cree el admin desde el builder.
   await knex.raw(`
     UPDATE submodules
@@ -33,14 +35,14 @@ export async function seed(knex: Knex): Promise<void> {
      WHERE deleted_at IS NULL
        AND module_id IN (
          SELECT id FROM modules
-          WHERE name <> N'Administración' AND deleted_at IS NULL
+          WHERE name NOT IN (N'Administración', N'APIs') AND deleted_at IS NULL
        )
   `);
   await knex.raw(`
     UPDATE modules
        SET deleted_at = SYSUTCDATETIME()
      WHERE deleted_at IS NULL
-       AND name <> N'Administración'
+       AND name NOT IN (N'Administración', N'APIs')
   `);
 
   // ── Módulo Administración ────────────────────────────────────
@@ -142,4 +144,123 @@ export async function seed(knex: Knex): Promise<void> {
       }
     );
   }
+
+  // ── Módulo APIs ──────────────────────────────────────────────
+  // Top-level — al mismo nivel que "Administración", no adentro.
+  // Por ahora contiene un solo submódulo (Google). Cuando se sumen
+  // Microsoft / Slack / etc. van como nuevos submódulos del mismo módulo.
+  await knex.raw(
+    `
+    MERGE modules AS target
+    USING (SELECT N'APIs' AS name) AS src
+    ON target.name = src.name AND target.deleted_at IS NULL
+    WHEN MATCHED THEN UPDATE SET
+      icon          = :icon,
+      display_order = 2
+    WHEN NOT MATCHED THEN
+      INSERT (name, icon, display_order)
+      VALUES (src.name, :icon, 2);
+  `,
+    { icon: ICON_PLUG }
+  );
+
+  // Submódulos del módulo APIs — UNO POR CADA API individual.
+  // Cuando se sumen Drive / Calendar / Gmail / Microsoft / etc. van
+  // como entradas separadas del sidebar, NO agrupadas por proveedor.
+  // (La cuenta de Google se conecta una sola vez y vale para todas
+  // las APIs de Google del tester — la conexión se hace dentro de
+  // cada tester.)
+  // Cada API es UN MÓDULO frontend independiente (google-sheets,
+  // google-drive, google-calendar, …) — folder_key coincide con la
+  // carpeta del módulo en src/modules/.
+  const apiSubs = [
+    {
+      name: 'Hoja de cálculo',
+      icon: ICON_GRID,
+      path: '/google/sheets',
+      folder: 'google-sheets',
+      order: 1
+    },
+    {
+      name: 'Drive',
+      icon: ICON_BOX,
+      path: '/google/drive',
+      folder: 'google-drive',
+      order: 2
+    },
+    {
+      name: 'Calendario',
+      icon: ICON_LAYERS,
+      path: '/google/calendar',
+      folder: 'google-calendar',
+      order: 3
+    },
+    {
+      name: 'Gmail',
+      icon: ICON_PANEL,
+      path: '/google/gmail',
+      folder: 'google-gmail',
+      order: 4
+    },
+    {
+      name: 'Documentos',
+      icon: ICON_PANEL,
+      path: '/google/docs',
+      folder: 'google-docs',
+      order: 5
+    },
+    {
+      name: 'Tareas',
+      icon: ICON_PUZZLE,
+      path: '/google/tasks',
+      folder: 'google-tasks',
+      order: 6
+    },
+    {
+      name: 'Meet',
+      icon: ICON_PLUG,
+      path: '/google/meet',
+      folder: 'google-meet',
+      order: 7
+    }
+  ];
+  for (const s of apiSubs) {
+    await knex.raw(
+      `
+      DECLARE @apis_id INT = (
+        SELECT id FROM modules WHERE name = N'APIs' AND deleted_at IS NULL
+      );
+      IF @apis_id IS NOT NULL
+      BEGIN
+        MERGE submodules AS target
+        USING (SELECT @apis_id AS module_id, :folder AS folder_key) AS src
+        ON target.folder_key = src.folder_key AND target.deleted_at IS NULL
+        WHEN MATCHED THEN UPDATE SET
+          module_id     = src.module_id,
+          name          = :name,
+          icon          = :icon,
+          path          = :path,
+          display_order = :order_,
+          deleted_at    = NULL
+        WHEN NOT MATCHED THEN
+          INSERT (module_id, name, icon, path, folder_key, display_order)
+          VALUES (src.module_id, :name, :icon, :path, src.folder_key, :order_);
+      END
+      `,
+      {
+        folder: s.folder,
+        name: s.name,
+        icon: s.icon,
+        path: s.path,
+        order_: s.order
+      }
+    );
+  }
+
+  // Limpieza: versiones viejas que ya no van.
+  await knex.raw(`
+    UPDATE submodules SET deleted_at = SYSUTCDATETIME()
+     WHERE folder_key IN (N'apis', N'apis-google', N'apis-sheets')
+       AND deleted_at IS NULL
+  `);
 }

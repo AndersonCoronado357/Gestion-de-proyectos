@@ -22,6 +22,17 @@ const buildTestRunnerRoutes = require('./modules/test-runner/test-runner.routes'
 const buildLogsRoutes = require('./modules/logs/adapters/entry/logs.routes');
 const buildIconsRoutes = require('./modules/icons/adapters/entry/icons.routes');
 const buildDesignRoutes = require('./modules/design/adapters/entry/design.routes');
+// external-apis/ es la carpeta compartida para integraciones con servicios
+// de terceros (Google, etc.) — separada de modules/ porque no son módulos
+// del negocio, son canales hacia afuera.
+const buildGoogleSharedRoutes = require('./external-apis/google/_shared/adapters/entry/google.routes');
+const buildGoogleSheetsRoutes = require('./external-apis/google/sheets/adapters/entry/sheets.routes');
+const buildGoogleDriveRoutes = require('./external-apis/google/drive/adapters/entry/drive.routes');
+const buildGoogleCalendarRoutes = require('./external-apis/google/calendar/adapters/entry/calendar.routes');
+const buildGoogleGmailRoutes = require('./external-apis/google/gmail/adapters/entry/gmail.routes');
+const buildGoogleDocsRoutes = require('./external-apis/google/docs/adapters/entry/docs.routes');
+const buildGoogleTasksRoutes = require('./external-apis/google/tasks/adapters/entry/tasks.routes');
+const buildGoogleMeetRoutes = require('./external-apis/google/meet/adapters/entry/meet.routes');
 const LogRepositoryImpl = require('./modules/logs/adapters/exit/log.repository.impl');
 const { buildLogsMiddleware } = require('./modules/logs/adapters/entry/logs.middleware');
 
@@ -61,6 +72,15 @@ module.exports = function buildApp() {
   app.use('/api/logs', buildLogsRoutes(db));
   app.use('/api/icons', buildIconsRoutes(db));
   app.use('/api/design', buildDesignRoutes(db));
+  // ── APIs externas (integraciones con terceros) ─────────────────
+  app.use('/api/external-apis/google', buildGoogleSharedRoutes(db));
+  app.use('/api/external-apis/google/sheets', buildGoogleSheetsRoutes(db));
+  app.use('/api/external-apis/google/drive', buildGoogleDriveRoutes(db));
+  app.use('/api/external-apis/google/calendar', buildGoogleCalendarRoutes(db));
+  app.use('/api/external-apis/google/gmail', buildGoogleGmailRoutes(db));
+  app.use('/api/external-apis/google/docs', buildGoogleDocsRoutes(db));
+  app.use('/api/external-apis/google/tasks', buildGoogleTasksRoutes(db));
+  app.use('/api/external-apis/google/meet', buildGoogleMeetRoutes(db));
 
   app.use((req, res) => res.status(404).json({ error: 'NOT_FOUND', path: req.path }));
   // El error handler recibe el repo para persistir excepciones no manejadas.
