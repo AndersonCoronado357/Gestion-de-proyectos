@@ -145,21 +145,6 @@ function defaultFrameRect(index: number): FrameRect {
   };
 }
 
-function StarIcon({ filled }: { filled: boolean }) {
-  return (
-    <svg width={11} height={11} viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round">
-      <path d="M12 2 L14.91 8.41 22 9.27 16.73 14.14 18.18 21.02 12 17.27 5.82 21.02 7.27 14.14 2 9.27 9.09 8.41 Z" />
-    </svg>
-  );
-}
-function TrashSmall() {
-  return (
-    <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z" />
-    </svg>
-  );
-}
-
 // Configuración de los 8 handles (posicion + cursor)
 const HANDLES: Array<{ axis: ResizeAxis; style: React.CSSProperties; cursor: string }> = [
   { axis: 'nw', style: { top: -3, left: -3 }, cursor: 'cursor-nwse-resize' },

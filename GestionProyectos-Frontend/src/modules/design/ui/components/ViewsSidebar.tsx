@@ -9,6 +9,7 @@ import Input from '../../../../shared/components/Input/index.js';
 import {
   CheckIcon,
   PlusIcon,
+  StarIcon,
   TrashIcon,
   XIcon
 } from '../../../../shared/icons/index.js';
@@ -25,19 +26,14 @@ interface Props {
   onSetPrimary: (id: number) => Promise<void>;
 }
 
-function StarIcon({ filled }: { filled: boolean }) {
+// Wrapper local que delega en StarIcon de la BD.
+function StarMark({ filled }: { filled: boolean }) {
   return (
-    <svg
+    <StarIcon
       width={12}
       height={12}
-      viewBox="0 0 24 24"
-      fill={filled ? 'currentColor' : 'none'}
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinejoin="round"
-    >
-      <path d="M12 2 L14.91 8.41 22 9.27 16.73 14.14 18.18 21.02 12 17.27 5.82 21.02 7.27 14.14 2 9.27 9.09 8.41 Z" />
-    </svg>
+      className={filled ? '[&_svg_path]:fill-current' : undefined}
+    />
   );
 }
 
@@ -132,7 +128,7 @@ export default function ViewsSidebar({
                         )}
                         title={primary ? 'Vista inicial' : ''}
                       >
-                        <StarIcon filled={primary} />
+                        <StarMark filled={primary} />
                       </span>
                       <span
                         className={cn(
@@ -151,7 +147,7 @@ export default function ViewsSidebar({
                           title="Marcar como vista inicial"
                           className="inline-flex h-5 w-5 items-center justify-center rounded-md text-fg-faint outline-none hover:bg-bg hover:text-fg"
                         >
-                          <StarIcon filled={false} />
+                          <StarMark filled={false} />
                         </button>
                       )}
                       <button

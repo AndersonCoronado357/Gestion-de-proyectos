@@ -9,6 +9,10 @@ import ComponentsPanel from '../components/ComponentsPanel.js';
 import PropertiesPanel from '../components/PropertiesPanel.js';
 import FramePropertiesPanel from '../components/FramePropertiesPanel.js';
 import BottomToolbar, { type CursorMode } from '../components/BottomToolbar.js';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon
+} from '../../../../shared/icons/index.js';
 import { useDesignEditor } from '../hooks/useDesignEditor.js';
 import { instantiateBlock } from '../../lib/blockManifest.js';
 import { FRAME_PADDING } from '../../types.js';
@@ -114,13 +118,9 @@ export default function DesignEditorPage() {
             className="absolute -right-3 top-1/2 z-10 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-bg text-fg-muted shadow-md ring-1 ring-border-subtle outline-none transition-colors hover:text-fg"
           >
             {leftCollapsed ? (
-              <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRightIcon width={11} height={11} />
             ) : (
-              <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeftIcon width={11} height={11} />
             )}
           </button>
 

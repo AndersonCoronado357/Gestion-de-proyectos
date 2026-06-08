@@ -3,7 +3,11 @@
 
 import { useState } from 'react';
 import { cn } from '../../../../shared/lib/cn.js';
-import { PlusIcon, TrashIcon } from '../../../../shared/icons/index.js';
+import {
+  PlusIcon,
+  StarIcon,
+  TrashIcon
+} from '../../../../shared/icons/index.js';
 import DragDropList from '../../../../shared/components/DragDropList/index.js';
 import Alert from '../../../../shared/components/Alert/index.js';
 import type { DesignView } from '../../api.js';
@@ -21,19 +25,15 @@ interface Props {
   onReorder: (next: DesignView[]) => void;
 }
 
-function StarIcon({ filled }: { filled: boolean }) {
+// Wrapper local que delega en StarIcon de la BD. `filled` se pisa con
+// `[&_svg_path]:fill-current` que override el fill="none" del SVG.
+function StarMark({ filled }: { filled: boolean }) {
   return (
-    <svg
+    <StarIcon
       width={11}
       height={11}
-      viewBox="0 0 24 24"
-      fill={filled ? 'currentColor' : 'none'}
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinejoin="round"
-    >
-      <path d="M12 2 L14.91 8.41 22 9.27 16.73 14.14 18.18 21.02 12 17.27 5.82 21.02 7.27 14.14 2 9.27 9.09 8.41 Z" />
-    </svg>
+      className={filled ? '[&_svg_path]:fill-current' : undefined}
+    />
   );
 }
 
@@ -117,7 +117,7 @@ export default function ViewsPanel({
                   primary ? 'text-warning-text' : 'text-fg-faint hover:text-fg'
                 )}
               >
-                <StarIcon filled={primary} />
+                <StarMark filled={primary} />
               </button>
               <button
                 type="button"

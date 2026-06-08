@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '../../../../shared/lib/cn.js';
 import Skeleton from '../../../../shared/components/Skeleton/index.js';
 import { useHeaderSlot } from '../../../../shared/components/Header/HeaderSlotContext.js';
+import { ArrowLeftIcon } from '../../../../shared/icons/index.js';
 import ViewRenderer from '../components/ViewRenderer.js';
 import {
   getProject,
@@ -17,11 +18,7 @@ import {
 import { parseLayout, type LayoutContent } from '../../types.js';
 
 function BackIcon() {
-  return (
-    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19 12H5M12 19l-7-7 7-7" />
-    </svg>
-  );
+  return <ArrowLeftIcon width={14} height={14} />;
 }
 
 export default function PreviewPage() {
