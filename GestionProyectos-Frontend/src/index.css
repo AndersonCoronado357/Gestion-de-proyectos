@@ -361,3 +361,9 @@ body {
 ::-webkit-scrollbar-button {
   display: none;
 }
+/* Esquina donde se cruzan scrollbar horizontal y vertical — por defecto
+ * el navegador la pinta blanca. La hacemos transparente para que tome
+ * el color del contenedor de fondo. */
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
