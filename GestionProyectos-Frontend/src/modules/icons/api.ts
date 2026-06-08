@@ -16,7 +16,16 @@ export interface IconItem {
   displayName?: string | null;
   svg: string;
   hash: string;
+  /** Total usos (sidebar + código). */
   usageCount?: number;
+  /** Usos en el sidebar (modules + submodules). */
+  sidebarUsageCount?: number;
+  /** Cantidad de archivos del front donde aparece. */
+  codeUsageCount?: number;
+  /** Rutas relativas (src/...) donde el icono se referencia. */
+  codeUsageFiles?: string[];
+  /** Lista de modules/submodules del sidebar que apuntan al icono. */
+  sidebarUsageRefs?: string[];
 }
 
 export interface IconListResult {

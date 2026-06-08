@@ -2,32 +2,14 @@
 // Usa Input/Textarea/Button del catálogo compartido. Footer con Eliminar +
 // Guardar en una misma fila. SVG con autosave debounced (realtime).
 
-import { useEffect, useRef, useState, type SVGProps } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '../../../../shared/lib/cn.js';
 import Input from '../../../../shared/components/Input/index.js';
 import Textarea from '../../../../shared/components/Textarea/index.js';
 import Button from '../../../../shared/components/Button/index.js';
-import { TrashIcon, CheckIcon } from '../../../../shared/icons/index.js';
+import { CheckIcon, TrashIcon, XIcon } from '../../../../shared/icons/index.js';
 import { normalizeIconSvg } from '../lib/normalizeIconSvg.js';
 import type { IconItem } from '../../api.js';
-
-function CloseIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      width={11}
-      height={11}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="M18 6 6 18M6 6l12 12" />
-    </svg>
-  );
-}
 
 interface Props {
   icon: IconItem;
@@ -120,7 +102,7 @@ export default function IconSidePanel({
           title="Cerrar panel"
           className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-fg-faint outline-none transition-colors hover:bg-danger-surface hover:text-danger-text"
         >
-          <CloseIcon />
+          <XIcon width={11} height={11} />
         </button>
       </div>
 
@@ -142,12 +124,57 @@ export default function IconSidePanel({
             <p className="font-mono text-[10.5px] text-fg-faint">{icon.name}</p>
           )}
           {icon.usageCount != null && (
-            <p className="text-[11px] text-fg-faint">
-              Usado por {icon.usageCount} elemento
-              {icon.usageCount === 1 ? '' : 's'}
-            </p>
+            <div className="flex flex-col items-center gap-0.5 text-[11px] text-fg-faint">
+              <p>
+                <b className="text-fg">{icon.usageCount}</b> uso
+                {icon.usageCount === 1 ? '' : 's'} totales
+              </p>
+              <p>
+                Sidebar: <b className="text-fg">{icon.sidebarUsageCount ?? 0}</b>
+                {' · '}
+                Código: <b className="text-fg">{icon.codeUsageCount ?? 0}</b>
+              </p>
+            </div>
           )}
         </div>
+
+        {(icon.sidebarUsageRefs?.length ?? 0) > 0 && (
+          <div className="flex max-h-24 shrink-0 flex-col gap-1 overflow-y-auto rounded-lg bg-bg-muted/30 px-3 py-2">
+            <span className="text-[10.5px] font-semibold uppercase tracking-wider text-fg-faint">
+              Sidebar ({icon.sidebarUsageRefs?.length})
+            </span>
+            <ul className="flex flex-col gap-0.5">
+              {icon.sidebarUsageRefs?.map((r, i) => (
+                <li
+                  key={`${r}-${i}`}
+                  className="truncate text-[11px] text-fg-muted"
+                  title={r}
+                >
+                  {r}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {(icon.codeUsageFiles?.length ?? 0) > 0 && (
+          <div className="flex max-h-32 shrink-0 flex-col gap-1 overflow-y-auto rounded-lg bg-bg-muted/30 px-3 py-2">
+            <span className="text-[10.5px] font-semibold uppercase tracking-wider text-fg-faint">
+              Archivos del código ({icon.codeUsageFiles?.length})
+            </span>
+            <ul className="flex flex-col gap-0.5">
+              {icon.codeUsageFiles?.map((f) => (
+                <li
+                  key={f}
+                  className="truncate font-mono text-[10.5px] text-fg-muted"
+                  title={f}
+                >
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <Input
           label="Nombre visible"
