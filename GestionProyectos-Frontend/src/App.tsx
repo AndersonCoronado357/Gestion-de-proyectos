@@ -110,6 +110,9 @@ export default function App() {
           path="/administracion/submodulos/:id"
           element={<SubmoduleHubPage />}
         />
+        {/* APIs externas — cada API es un submódulo del módulo "APIs"
+            con su propio path y page-registry, así no hace falta
+            registrar rutas a mano acá. */}
         {/* Compatibilidad con URLs viejas: TODAS redirigen a la lista
             (sin preservar el id), así si quedó algún navigate cacheado
             que apunte a la ruta vieja con id, igual cae en la lista —

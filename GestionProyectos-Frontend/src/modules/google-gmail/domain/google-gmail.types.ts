@@ -1,0 +1,24 @@
+export interface GmailLabel {
+  id: string;
+  name: string;
+  type: string | null;
+  messagesTotal: number | null;
+  messagesUnread: number | null;
+}
+
+export interface MessageSummary {
+  id: string;
+  threadId: string;
+  snippet: string;
+  labelIds: string[];
+  from: string | null;
+  to: string | null;
+  subject: string | null;
+  date: string | null;
+  unread: boolean;
+}
+
+export interface MessageDetail extends MessageSummary {
+  bodyText: string | null;
+  bodyHtml: string | null;
+}

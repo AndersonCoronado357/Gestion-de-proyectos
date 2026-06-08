@@ -68,7 +68,11 @@ export default defineConfig({
     port: 5174,
     strictPort: true,
     proxy: {
-      '/api': {
+      // OJO: el patrón es regex (empieza con `^`) y EXIGE la barra
+      // después de `api`.  Sin esto, `/api` matchea también `/apis/...`
+      // por prefijo y reventaba el reload de rutas tipo
+      // `/apis/hoja-de-calculo`.
+      '^/api/': {
         target: 'http://localhost:3001',
         changeOrigin: true
       }

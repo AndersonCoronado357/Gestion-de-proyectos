@@ -30,6 +30,9 @@ import SubmoduleListPage from '../modules/page-builder/ui/pages/SubmoduleListPag
 const STATIC_REGISTRY: Record<string, ComponentType> = {
   'modules-and-submodules': ModulesBuilderPage,
   'page-builder': SubmoduleListPage,
+  // Cada API de Google es su propio módulo (google-sheets, google-drive,
+  // …) y se auto-descubre por su *ListPage.tsx — no hace falta listarlas
+  // acá. Sólo van entradas STATIC los módulos administrativos a mano.
   'roles-and-permissions': RolesAndPermissionsPage,
   users: UsersPage,
   components: ComponentsPage,
