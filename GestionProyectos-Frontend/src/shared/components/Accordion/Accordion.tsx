@@ -1,6 +1,7 @@
 // Accordion — secciones colapsables. `multiple` permite varias abiertas.
 
 import { useState, type ReactNode } from 'react';
+import { ChevronRightIcon } from '../../icons/index.js';
 import { cn } from '../../lib/cn.js';
 
 export interface AccordionItem {
@@ -45,20 +46,14 @@ export default function Accordion({
               className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-[13px] font-medium text-fg outline-none"
             >
               {it.title}
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              <span
                 className={cn(
-                  'h-3.5 w-3.5 shrink-0 text-fg-faint transition-transform duration-300',
+                  'inline-flex h-3.5 w-3.5 shrink-0 text-fg-faint transition-transform duration-300',
                   on && 'rotate-90'
                 )}
               >
-                <path d="m9 6 6 6-6 6" />
-              </svg>
+                <ChevronRightIcon width={14} height={14} />
+              </span>
             </button>
             {/* Truco grid-rows-[0fr]/[1fr] → anima la altura sin medir DOM. */}
             <div

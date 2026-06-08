@@ -1,26 +1,8 @@
-import type { SVGProps } from 'react';
 import SearchInput from '../SearchInput/index.js';
 import UserMenu from '../UserMenu/index.js';
 import { useSearch } from '../../search/SearchContext.js';
+import { MenuIcon } from '../../icons/index.js';
 import { useHeaderSlots } from './HeaderSlotContext.js';
-
-function MenuIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      width={20}
-      height={20}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  );
-}
 
 export interface HeaderProps {
   title?: string;
@@ -55,7 +37,7 @@ export default function Header({
         aria-label="Abrir menú"
         className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-fg-muted outline-none transition-colors hover:bg-bg-muted hover:text-fg md:hidden"
       >
-        <MenuIcon />
+        <MenuIcon width={20} height={20} />
       </button>
 
       {slots.leading && (

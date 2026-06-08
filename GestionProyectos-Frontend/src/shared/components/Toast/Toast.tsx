@@ -1,3 +1,7 @@
+// EXCEPCIÓN A LA REGLA "todos los iconos en BD": los iconos del Toast
+// llevan animación de trazo (mismo patrón que Alert). Son fijos —
+// success/error/warning — y no cambian nunca. Se quedan inline.
+
 import {
   createContext,
   useCallback,

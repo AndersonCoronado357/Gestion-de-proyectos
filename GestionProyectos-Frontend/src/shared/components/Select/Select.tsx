@@ -11,7 +11,8 @@ import { useCloseOnScroll } from '../../lib/useCloseOnScroll.js';
 import {
   ChevronDownIcon,
   CheckIcon,
-  SearchIcon
+  SearchIcon,
+  XIcon
 } from '../../icons/index.js';
 
 const POPUP_MARGIN = 8;
@@ -285,18 +286,7 @@ export default function Select<V extends string | number = string>({
               : 'pointer-events-none opacity-0'
           )}
         >
-          <svg
-            width={9}
-            height={9}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2.4}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M18 6 6 18M6 6l12 12" />
-          </svg>
+          <XIcon width={9} height={9} />
         </span>
         <span
           className={cn(

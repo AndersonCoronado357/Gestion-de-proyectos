@@ -3,6 +3,7 @@
 
 import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { XIcon } from '../../icons/index.js';
 import { cn } from '../../lib/cn.js';
 
 export type ModalSize = 'sm' | 'md' | 'lg';
@@ -65,16 +66,7 @@ export default function Modal({
               aria-label="Cerrar"
               className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-fg-faint outline-none transition-colors hover:bg-bg-muted hover:text-fg"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                className="h-4 w-4"
-              >
-                <path d="M6 6l12 12M18 6 6 18" />
-              </svg>
+              <XIcon width={16} height={16} />
             </button>
           </div>
         )}

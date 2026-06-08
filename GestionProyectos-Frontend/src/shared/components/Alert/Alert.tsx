@@ -1,3 +1,10 @@
+// EXCEPCIÓN A LA REGLA "todos los iconos en BD": los iconos de Alert
+// llevan animación de trazo (`pathLength` + `icon-draw` + delay) que
+// requiere control fino de los paths individuales. El renderizado por
+// dangerouslySetInnerHTML del componente <Icon> no permite eso. Son los
+// 4 únicos iconos siempre fijos del set (success/error/warning/confirm),
+// no cambian nunca, así que se quedan inline.
+
 import type { CSSProperties, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../../lib/cn.js';

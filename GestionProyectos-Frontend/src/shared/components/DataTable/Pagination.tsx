@@ -1,43 +1,24 @@
+import { useEffect, useState, type ComponentType } from 'react';
 import {
-  useEffect,
-  useState,
-  type ComponentType,
-  type SVGProps
-} from 'react';
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
+  type IconProps
+} from '../../icons/index.js';
 import { cn } from '../../lib/cn.js';
 
-type IconProps = SVGProps<SVGSVGElement>;
-
-const ICON_PROPS: IconProps = {
-  width: 14,
-  height: 14,
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.8,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round'
-};
-
 const ChevronLeft = (p: IconProps) => (
-  <svg {...ICON_PROPS} {...p}>
-    <path d="m15 18-6-6 6-6" />
-  </svg>
+  <ChevronLeftIcon width={14} height={14} {...p} />
 );
 const ChevronRight = (p: IconProps) => (
-  <svg {...ICON_PROPS} {...p}>
-    <path d="m9 18 6-6-6-6" />
-  </svg>
+  <ChevronRightIcon width={14} height={14} {...p} />
 );
 const ChevronsLeft = (p: IconProps) => (
-  <svg {...ICON_PROPS} {...p}>
-    <path d="m11 17-5-5 5-5M18 17l-5-5 5-5" />
-  </svg>
+  <ChevronsLeftIcon width={14} height={14} {...p} />
 );
 const ChevronsRight = (p: IconProps) => (
-  <svg {...ICON_PROPS} {...p}>
-    <path d="m13 17 5-5-5-5M6 17l5-5-5-5" />
-  </svg>
+  <ChevronsRightIcon width={14} height={14} {...p} />
 );
 
 interface NavButtonProps {
