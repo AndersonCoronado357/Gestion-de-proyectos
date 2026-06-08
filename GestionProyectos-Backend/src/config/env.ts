@@ -69,6 +69,11 @@ module.exports = {
   // OAuth Client ID de Google (login con Google). Se valida que el
   // `aud` del ID token coincida con este valor.
   googleClientId: process.env.GOOGLE_CLIENT_ID || '',
+  // Client SECRET del mismo OAuth Client ID de arriba. Sólo el backend
+  // lo conoce — el frontend nunca debe verlo. Se usa para intercambiar
+  // el authorization code del consent de Sheets/Drive por
+  // access_token + refresh_token (flow code de Google OAuth 2.0).
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
   // Master key para encriptar credenciales de APIs externas en .env.
   // Formato: 32 bytes en base64 (`openssl rand -base64 32`).
   // Si no se setea, se usa una key fija de DEV — NO usar en prod.
