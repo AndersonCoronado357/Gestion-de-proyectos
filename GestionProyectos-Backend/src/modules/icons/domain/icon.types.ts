@@ -10,8 +10,17 @@ export interface IconRow {
   svg: string;
   /** Hash sha256 del SVG normalizado — UNIQUE en BD para deduplicar. */
   hash: string;
-  /** Cuántos modules + submodules lo están usando. Calculado, no persistido. */
+  /** Suma total de usos: sidebar (modules+submodules) + código frontend.
+   *  Calculado, no persistido. */
   usageCount?: number;
+  /** Uses contados en el sidebar (modules + submodules). */
+  sidebarUsageCount?: number;
+  /** Cantidad de archivos del frontend src donde aparece el componente. */
+  codeUsageCount?: number;
+  /** Paths relativos (src/...) de archivos del front donde se usa. */
+  codeUsageFiles?: string[];
+  /** Nombres de modules/submodules del sidebar que apuntan al icono. */
+  sidebarUsageRefs?: string[];
 }
 
 export interface IconUpsertInput {

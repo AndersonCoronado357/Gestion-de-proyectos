@@ -8,6 +8,7 @@ import type {
   IconUpsertInput
 } from '../../domain/icon.types';
 import type { IconRepositoryPort } from '../../ports/icon.repository';
+import { getCodeUsage } from '../../use-cases/scanCodeUsage';
 
 const IconRepository = require('../../ports/icon.repository');
 
@@ -20,13 +21,19 @@ interface DbRow {
 }
 
 function toRow(r: DbRow & { usage_count?: number | string }): IconRow {
+  const sidebar = r.usage_count != null ? Number(r.usage_count) : 0;
+  const usage = r.name ? getCodeUsage().get(r.name) : undefined;
+  const code = usage?.count ?? 0;
   return {
     id: r.id,
     name: r.name,
     displayName: r.display_name ?? null,
     svg: r.svg,
     hash: r.hash,
-    usageCount: r.usage_count != null ? Number(r.usage_count) : undefined
+    sidebarUsageCount: sidebar,
+    codeUsageCount: code,
+    codeUsageFiles: usage?.files ?? [],
+    usageCount: sidebar + code
   };
 }
 
@@ -53,6 +60,9 @@ class IconRepositoryImpl extends IconRepository implements IconRepositoryPort {
     const offset = Math.max(filters.offset ?? 0, 0);
     const sources = await this.usageSources();
     // Subquery que suma todos los conteos (modules + submodules) por icono.
+    // Sólo contamos rows VIVAS (deleted_at IS NULL) — sin esto el icono
+    // queda "en uso" incluso después de que el submódulo que lo usaba
+    // fue soft-deleteado, y nunca se puede borrar del catálogo.
     const usageSelect =
       sources.length === 0
         ? this.db.raw('0 AS usage_count')
@@ -60,7 +70,7 @@ class IconRepositoryImpl extends IconRepository implements IconRepositoryPort {
             `(${sources
               .map(
                 (t) =>
-                  `(SELECT COUNT(*) FROM ${t} WHERE ${t}.icon_id = ${this.table}.id)`
+                  `(SELECT COUNT(*) FROM ${t} WHERE ${t}.icon_id = ${this.table}.id AND ${t}.deleted_at IS NULL)`
               )
               .join(' + ')}) AS usage_count`
           );
@@ -86,6 +96,27 @@ class IconRepositoryImpl extends IconRepository implements IconRepositoryPort {
       .limit(limit)
       .offset(offset)) as Array<DbRow & { usage_count?: number | string }>;
 
+    // Para los iconos con uso > 0, levantamos los nombres reales de los
+    // modules/submodules que apuntan a cada icono — útil para que el
+    // panel lateral diga DÓNDE se usa, no sólo cuántas veces.
+    const usedIds = rows
+      .filter((r) => Number(r.usage_count ?? 0) > 0)
+      .map((r) => r.id);
+    const refMap = new Map<number, string[]>();
+    if (usedIds.length > 0) {
+      for (const t of sources) {
+        const ref = (await this.db(t)
+          .whereIn('icon_id', usedIds)
+          .whereNull('deleted_at')
+          .select('icon_id', 'name')) as Array<{ icon_id: number; name: string }>;
+        for (const r of ref) {
+          const list = refMap.get(r.icon_id) ?? [];
+          list.push(`${t === 'submodules' ? 'Submódulo' : 'Módulo'}: ${r.name}`);
+          refMap.set(r.icon_id, list);
+        }
+      }
+    }
+
     const totalQ = this.db<DbRow>(this.table).count<{ c: number | string }[]>({
       c: '*'
     });
@@ -96,7 +127,12 @@ class IconRepositoryImpl extends IconRepository implements IconRepositoryPort {
     const totalRows = await totalQ;
     const total = Number((totalRows[0] as { c?: number | string } | undefined)?.c ?? 0);
 
-    return { items: rows.map(toRow), total };
+    const items = rows.map((r) => {
+      const row = toRow(r);
+      row.sidebarUsageRefs = refMap.get(r.id) ?? [];
+      return row;
+    });
+    return { items, total };
   }
 
   async findById(id: number): Promise<IconRow | null> {
@@ -148,8 +184,16 @@ class IconRepositoryImpl extends IconRepository implements IconRepositoryPort {
     for (const t of await this.usageSources()) {
       const c = (await this.db(t)
         .where({ icon_id: id })
+        .whereNull('deleted_at')
         .count<{ c: number | string }[]>({ c: '*' })) as Array<{ c: number | string }>;
       usageCount += Number((c[0] as { c?: number | string } | undefined)?.c ?? 0);
+    }
+    // También bloqueamos delete si el icono se usa desde el código —
+    // borrarlo rompería componentes en producción.
+    const row = await this.db<DbRow>(this.table).where({ id }).first('name');
+    if (row?.name) {
+      const code = getCodeUsage().get(row.name);
+      if (code?.count) usageCount += code.count;
     }
     if (usageCount > 0) return { deleted: false, usageCount };
     const deleted = await this.db(this.table).where({ id }).del();
