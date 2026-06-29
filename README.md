@@ -51,3 +51,20 @@ npm run dev         # :5173
 - **TCP/IP habilitado** en la instancia (el driver `tedious` solo habla TCP).
 - Base de datos **`GestionProyectos`** creada.
 - Credenciales en `GestionProyectos-Backend/.env`.
+
+## Despliegue en acmsy
+
+La app corre en acmsy en dos contenedores separados, con auto-deploy en cada
+push a `main`:
+
+- **Frontend:** https://gestion.acmsy.com (React/Vite, servido por nginx).
+- **Backend:** https://api-gestion.acmsy.com (Node/Express; el frontend lo
+  consume vía `VITE_API_BASE_URL`).
+- **Base de datos:** una instancia SQL Server gestionada en acmsy con dos
+  bases — `GestionProyectos` (producción, la usa el backend desplegado) y
+  `GestionProyectos_Test` (la usa tu entorno local).
+- **Auto-deploy:** cada `git push` a `main` dispara un webhook que actualiza
+  el repo y reconstruye ambos contenedores.
+
+Los `Dockerfile` de cada subcarpeta y `knexfile.prod.cjs` son la config de
+despliegue. Las credenciales NO van en el repo: se inyectan en acmsy.
