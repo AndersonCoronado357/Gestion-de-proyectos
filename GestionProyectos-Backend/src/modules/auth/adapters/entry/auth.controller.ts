@@ -61,6 +61,35 @@ async function verifyGoogleCredential(credential: string): Promise<string> {
   return p.email;
 }
 
+// Flujo de redirección (igual que el resto de apps de acmsy): el frontend
+// manda Google al callback, recibe un `code` y lo intercambia aquí por el
+// id_token usando el client + secret + redirect_uri registrados.
+async function exchangeGoogleCode(code: string): Promise<string> {
+  if (!env.googleClientId || !env.googleClientSecret) {
+    throw AppError.internalServerError('Google OAuth no configurado (faltan client id/secret)');
+  }
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI || '';
+  const body = new URLSearchParams({
+    code,
+    client_id: env.googleClientId,
+    client_secret: env.googleClientSecret,
+    redirect_uri: redirectUri,
+    grant_type: 'authorization_code'
+  });
+  const resp = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString()
+  });
+  if (!resp.ok) {
+    const t = await resp.text().catch(() => '');
+    throw AppError.unauthorized('No se pudo intercambiar el código de Google: ' + t.slice(0, 200));
+  }
+  const data = (await resp.json()) as { id_token?: string };
+  if (!data.id_token) throw AppError.unauthorized('Google no devolvió id_token');
+  return data.id_token;
+}
+
 function cookieOptions(maxAgeSeconds: number, remember: boolean): CookieOptions {
   // Sesión "infinita": SIEMPRE persistimos la cookie (maxAge largo), sin
   // importar `remember`. Se re-setea en cada /auth/refresh (sliding) para que
@@ -139,11 +168,17 @@ module.exports = ({ useCases }: { useCases: UseCases }) => ({
 
   google: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const credential = req.body?.credential;
+      let credential = req.body?.credential;
+      const code = req.body?.code;
+      // Flujo de redirección: si llega un `code` (y no un id_token), lo
+      // intercambiamos por el id_token.
+      if ((typeof credential !== 'string' || !credential) && typeof code === 'string' && code) {
+        credential = await exchangeGoogleCode(code);
+      }
       if (typeof credential !== 'string' || !credential) {
         res
           .status(400)
-          .json({ error: 'BAD_REQUEST', message: 'Missing Google credential' });
+          .json({ error: 'BAD_REQUEST', message: 'Missing Google credential or code' });
         return;
       }
       const email = await verifyGoogleCredential(credential);

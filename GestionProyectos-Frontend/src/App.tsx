@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Layout from './shared/components/Layout/index.js';
 import LoginPage from './modules/auth/ui/pages/LoginPage.js';
+import GoogleCallbackPage from './modules/auth/ui/pages/GoogleCallbackPage.js';
 import SettingsPage from './modules/settings/ui/pages/SettingsPage.js';
 import HomePage from './modules/home/ui/pages/HomePage.js';
 import SubmoduleHubPage from './modules/page-builder/ui/pages/SubmoduleHubPage.js';
@@ -78,6 +79,7 @@ export default function App() {
           /inicio o a /login. */}
       <Route path="/" element={<Navigate to={defaultPath} replace />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/auth/callback" element={<GoogleCallbackPage />} />
       {/* Editor fullscreen del Diseñador: fuera del Layout normal para
           ocupar toda la pantalla. Sigue protegido por sesión. */}
       <Route

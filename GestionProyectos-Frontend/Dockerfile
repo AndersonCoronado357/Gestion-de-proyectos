@@ -7,7 +7,11 @@ COPY . .
 # Variables de build de Vite (NO son secretos): URL pública del backend y el
 # Client ID público de Google. Vite las hornea en el bundle al compilar.
 ENV VITE_API_BASE_URL=https://api-gestion.acmsy.com/api
-ENV VITE_GOOGLE_CLIENT_ID=936397686328-k738c6pc5bn7qtrsb218h5ensp0qfu6k.apps.googleusercontent.com
+# Login con Google: cliente COMPARTIDO de acmsy (el mismo que Drestyl/landing) +
+# callback de redirección. Se registra https://gestion.acmsy.com/auth/callback
+# en ese cliente de Google.
+ENV VITE_GOOGLE_CLIENT_ID=487360576094-k5usrjm1b699kgv1nu3lat4ev0kpe8v8.apps.googleusercontent.com
+ENV VITE_GOOGLE_REDIRECT_URI=https://gestion.acmsy.com/auth/callback
 RUN npm run build
 
 FROM nginx:alpine AS run

@@ -18,10 +18,12 @@ export class AuthHttpAdapter extends AuthRepository {
     return data;
   }
 
-  async googleLogin(credential: string): Promise<LoginResponse> {
+  // Recibe el `code` del flujo de redirección de Google y lo manda al backend,
+  // que lo intercambia por el id_token y emite la sesión.
+  async googleLogin(code: string): Promise<LoginResponse> {
     const data = await http<LoginResponse>('/auth/google', {
       method: 'POST',
-      body: { credential },
+      body: { code },
       skipAuthRefresh: true
     });
     if (!data) throw new Error('Empty Google login response');
