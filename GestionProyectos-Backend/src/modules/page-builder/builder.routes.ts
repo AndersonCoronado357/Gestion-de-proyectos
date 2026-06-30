@@ -75,18 +75,66 @@ function rename(str: string, key: string): string {
 
 // Copia recursiva del módulo plantilla, renombrando carpetas, archivos y
 // contenido. Devuelve las rutas creadas (relativas al workspace).
-function cloneModule(srcDir: string, destDir: string, key: string, written: string[]): void {
+function cloneModule(srcDir: string, destDir: string, key: string, written: string[], workspace: string = WORKSPACE): void {
   for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
     const srcPath = path.join(srcDir, entry.name);
     const destPath = path.join(destDir, rename(entry.name, key));
     if (entry.isDirectory()) {
-      cloneModule(srcPath, destPath, key, written);
+      cloneModule(srcPath, destPath, key, written, workspace);
     } else {
       fs.mkdirSync(path.dirname(destPath), { recursive: true });
       fs.writeFileSync(destPath, rename(fs.readFileSync(srcPath, 'utf8'), key), 'utf8');
-      written.push(path.relative(WORKSPACE, destPath).split(path.sep).join('/'));
+      written.push(path.relative(workspace, destPath).split(path.sep).join('/'));
     }
   }
+}
+
+// --- Generación en producción (Approach A) ---------------------------------
+// En dev se escribe en el monorepo en disco. En prod (ALLOW_MODULE_GEN=1) se
+// clona el repo DENTRO del contenedor, se genera ahí, y se hace commit + push:
+// el webhook reconstruye prod con el módulo ya compilado. Cero archivos
+// efímeros, todo queda versionado en git.
+const { execFileSync } = require('node:child_process');
+
+function genEnabled(): boolean {
+  return env.nodeEnv !== 'production' || process.env.ALLOW_MODULE_GEN === '1';
+}
+function gitc(ws: string, args: string[]): void {
+  execFileSync('git', ['-C', ws, ...args], { stdio: 'pipe' });
+}
+function prepareWorkspace(): {
+  workspace: string;
+  backendSrc: string;
+  frontendSrc: string;
+  prod: boolean;
+} {
+  if (env.nodeEnv !== 'production') {
+    return { workspace: WORKSPACE, backendSrc: BACKEND_SRC, frontendSrc: FRONTEND_SRC, prod: false };
+  }
+  const ws = process.env.MODULE_WORKSPACE || '/app/gen-workspace';
+  const repo = process.env.GIT_REPO_URL;
+  if (!repo) throw new Error('Falta GIT_REPO_URL para generar módulos en producción.');
+  if (!fs.existsSync(path.join(ws, '.git'))) {
+    fs.mkdirSync(path.dirname(ws), { recursive: true });
+    execFileSync('git', ['clone', '--depth', '1', repo, ws], { stdio: 'pipe' });
+  } else {
+    gitc(ws, ['remote', 'set-url', 'origin', repo]);
+    gitc(ws, ['fetch', 'origin']);
+    gitc(ws, ['reset', '--hard', 'origin/HEAD']);
+  }
+  gitc(ws, ['config', 'user.email', process.env.GIT_AUTHOR_EMAIL || 'panel@acmsy.com']);
+  gitc(ws, ['config', 'user.name', process.env.GIT_AUTHOR_NAME || 'acmsy panel']);
+  return {
+    workspace: ws,
+    backendSrc: path.join(ws, 'GestionProyectos-Backend', 'src'),
+    frontendSrc: path.join(ws, 'GestionProyectos-Frontend', 'src'),
+    prod: true
+  };
+}
+function commitAndPush(ws: string, message: string): void {
+  gitc(ws, ['add', '-A']);
+  gitc(ws, ['commit', '-m', message]);
+  gitc(ws, ['push', 'origin', 'HEAD:main']);
 }
 
 function migrationContent(key: string): string {
@@ -270,14 +318,15 @@ module.exports = (db: Knex) => {
   const router = Router();
 
   router.post('/submodule', authMiddleware, validate(schema), (req, res, next) => {
-    if (env.nodeEnv === 'production') {
+    if (!genEnabled()) {
       res.status(403).json({
         error: 'FORBIDDEN',
-        message: 'El generador de módulos solo está disponible en desarrollo.'
+        message: 'El generador de módulos está deshabilitado.'
       });
       return;
     }
     try {
+      const { workspace, backendSrc, frontendSrc, prod } = prepareWorkspace();
       const name: string = req.body.name.trim();
       const key = toKey(name);
       if (!key || key === TEMPLATE) {
@@ -285,15 +334,15 @@ module.exports = (db: Knex) => {
         return;
       }
 
-      const beModuleDir = path.join(BACKEND_SRC, 'modules', key);
-      const feModuleDir = path.join(FRONTEND_SRC, 'modules', key);
+      const beModuleDir = path.join(backendSrc, 'modules', key);
+      const feModuleDir = path.join(frontendSrc, 'modules', key);
       if (fs.existsSync(beModuleDir) || fs.existsSync(feModuleDir)) {
         res.status(409).json({ error: 'CONFLICT', message: `Ya existe un módulo "${key}".` });
         return;
       }
 
-      const beTemplate = path.join(BACKEND_SRC, 'modules', TEMPLATE);
-      const feTemplate = path.join(FRONTEND_SRC, 'modules', TEMPLATE);
+      const beTemplate = path.join(backendSrc, 'modules', TEMPLATE);
+      const feTemplate = path.join(frontendSrc, 'modules', TEMPLATE);
       if (!fs.existsSync(beTemplate) || !fs.existsSync(feTemplate)) {
         res.status(500).json({
           error: 'NO_TEMPLATE',
@@ -303,25 +352,30 @@ module.exports = (db: Knex) => {
       }
 
       const written: string[] = [];
-      cloneModule(beTemplate, beModuleDir, key, written);
-      cloneModule(feTemplate, feModuleDir, key, written);
+      cloneModule(beTemplate, beModuleDir, key, written, workspace);
+      cloneModule(feTemplate, feModuleDir, key, written, workspace);
 
       // Migración + seed (module-x usa su propia tabla; el clon necesita la suya).
-      const migNum = nextNumber(path.join(BACKEND_SRC, 'database', 'migrations'));
-      const migPath = path.join(BACKEND_SRC, 'database', 'migrations', `${migNum}_create_${key}.ts`);
+      const migNum = nextNumber(path.join(backendSrc, 'database', 'migrations'));
+      const migPath = path.join(backendSrc, 'database', 'migrations', `${migNum}_create_${key}.ts`);
       fs.writeFileSync(migPath, migrationContent(key), 'utf8');
-      written.push(path.relative(WORKSPACE, migPath).split(path.sep).join('/'));
+      written.push(path.relative(workspace, migPath).split(path.sep).join('/'));
 
-      const seedNum = nextNumber(path.join(BACKEND_SRC, 'database', 'seeds'));
-      const seedPath = path.join(BACKEND_SRC, 'database', 'seeds', `${seedNum}_${key}.seed.ts`);
+      const seedNum = nextNumber(path.join(backendSrc, 'database', 'seeds'));
+      const seedPath = path.join(backendSrc, 'database', 'seeds', `${seedNum}_${key}.seed.ts`);
       fs.writeFileSync(seedPath, seedContent(name), 'utf8');
-      written.push(path.relative(WORKSPACE, seedPath).split(path.sep).join('/'));
+      written.push(path.relative(workspace, seedPath).split(path.sep).join('/'));
+
+      // En prod: commit + push -> el webhook reconstruye prod con el módulo ya
+      // compilado y la migración corre al arrancar el contenedor.
+      if (prod) commitAndPush(workspace, `feat(${key}): modulo generado desde el panel`);
 
       res.status(201).json({
         key,
         name: toPascal(key),
         count: written.length,
-        files: written.sort()
+        files: written.sort(),
+        deployed: prod
       });
     } catch (e) {
       next(e);
